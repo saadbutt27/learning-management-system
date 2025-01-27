@@ -2,11 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { query } from "@/lib/db";
 import { signJwtAccessToken } from "@/lib/jwt";
 
-// type User = {
-//     name:string
-//     user_id: string,
-//     password: string
-// }
 export async function POST(request: NextRequest) {
   const { userId, password } = await request.json();
   if (!userId || !password)
@@ -14,8 +9,6 @@ export async function POST(request: NextRequest) {
 
   let role;
   let res;
-
-  // console.log('kese: ', userId)
 
   if (userId[0] === "t" && userId[1] === "c") {
     res = await query({
@@ -31,8 +24,6 @@ export async function POST(request: NextRequest) {
     role = "student";
   }
 
-  // @ts-ignore
-  // console.log("Response: ", res);
   const userExist = res.length;
 
   if (!userExist) {
@@ -42,33 +33,12 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // @ts-ignore
-  const { password: pass, ...userWithoutPass } = res[0];
+  const { ...userWithoutPass } = res[0];
   const accessToken = signJwtAccessToken(userWithoutPass);
   const result = {
     ...userWithoutPass,
     accessToken,
     role,
   };
-  // console.log("Result: ", result);
-
-  // return !!userExist ? NextResponse.json(result): NextResponse.json(null);
   return NextResponse.json(result);
-
-  // console.log('user info: ', !!userExist);
-
-  // return NextResponse.json({userExist:!!userExist})
-
-  // const res = await fetch(DATA_SOURCE_URL, {
-  //     method: 'POST',
-  //     headers: {
-  //         'Content-Type': 'application/json',
-  //         'API-Key': API_KEY
-  //     },
-  //     body: JSON.stringify({ userId, title, completed: false })
-  // })
-
-  // const newTodo: Todo = await res.json();
-
-  // return NextResponse.json(newTodo);
 }

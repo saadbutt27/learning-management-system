@@ -1,4 +1,4 @@
-import { jwtVerify, SignJWT } from "jose";
+import { jwtVerify } from "jose";
 
 interface UserJwtPayload {
   jti: string;
@@ -23,6 +23,6 @@ export const verifyAuth = async (token: string) => {
     );
     return verified.payload as UserJwtPayload;
   } catch (error) {
-    throw new Error("Your token has expired.");
+    throw new Error("Your token has expired, and Error: " + error);
   }
 };

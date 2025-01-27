@@ -1,6 +1,6 @@
 export const formatDateTime = (dateTime: string) => {
-  let dat: string = new Date(dateTime).toString();
-  let dateTimeParts: string[] = dat.split(/[ ]/);
+  const dat: string = new Date(dateTime).toString();
+  const dateTimeParts: string[] = dat.split(/[ ]/);
 
   return `${dateTimeParts[1]} ${dateTimeParts[2]} ${
     dateTimeParts[3]
@@ -22,17 +22,14 @@ function tConvert(time: string) {
   if (matechedTime.length > 1) {
     // If matechedTime format correct
     matechedTime = matechedTime.slice(1); // Remove full string match value
-    // @ts-ignore
     matechedTime[5] = +matechedTime[0] < 12 ? "AM" : "PM"; // Set AM/PM
-    // @ts-ignore
-    matechedTime[0] = +matechedTime[0] % 12 || 12; // Adjust hours
+    matechedTime[0] = (+matechedTime[0] % 12 || 12).toString(); // Adjust hours
   }
-  // @ts-ignore
   return matechedTime.join(""); // return adjusted time or original string
 }
 
 export function toDateTime(time: string) {
-  let dat = time.split(/[T]/);
+  const dat = time.split(/[T]/);
   dat.push(":00");
   return dat[0] + ":" + dat[1] + dat[2];
 }

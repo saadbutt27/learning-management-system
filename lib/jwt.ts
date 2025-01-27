@@ -1,29 +1,36 @@
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt, { JwtPayload, SignOptions } from "jsonwebtoken";
 
-import { SignOptions } from "jsonwebtoken";
-
-interface SignOption extends SignOptions {}
-
-const DEFAULT_SIGN_OPTION: SignOption = {
+// Default options for signing the JWT
+const DEFAULT_SIGN_OPTION: SignOptions = {
   expiresIn: "1h",
 };
 
 export function signJwtAccessToken(
   payload: JwtPayload,
-  options: SignOption = DEFAULT_SIGN_OPTION
+  options: SignOptions = DEFAULT_SIGN_OPTION
 ) {
   const secret_key = process.env.SECRET_KEY;
-  const token = jwt.sign(payload, secret_key!, options);
+
+  if (!secret_key) {
+    throw new Error("SECRET_KEY is not defined in environment variables");
+  }
+
+  const token = jwt.sign(payload, secret_key, options);
   return token;
 }
 
 export function verifyJwt(token: string) {
   try {
     const secret_key = process.env.SECRET_KEY;
-    const decoded = jwt.verify(token, secret_key!);
+
+    if (!secret_key) {
+      throw new Error("SECRET_KEY is not defined in environment variables");
+    }
+
+    const decoded = jwt.verify(token, secret_key);
     return decoded as JwtPayload;
   } catch (error) {
-    console.log(error);
+    console.error("Error verifying JWT:", error);
     return null;
   }
 }

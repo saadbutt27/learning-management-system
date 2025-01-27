@@ -1,29 +1,35 @@
-import { Pool } from "pg";
+import { Pool, QueryResultRow } from "pg";
 
 // Initialize a connection pool for PostgreSQL
 const pool = new Pool({
   connectionString:
-    "postgresql://default:FvlS8zd0uebQ@ep-dawn-salad-a4hqsmyk-pooler.us-east-1.aws.neon.tech/lms?sslmode=require",
+    process.env.DB_URL,
 });
 
-export async function query({
+// Define the query function
+export async function query<T extends QueryResultRow>({
   query,
   values = [],
 }: {
   query: string;
-  values: any[]; // Updated to accept any type of values
-}) {
+  values: unknown[]; // Accept any type of values
+}): Promise<T[]> {
   const client = await pool.connect(); // Get a client from the pool
-  // console.log(client);
+
   try {
     // Log the query and its values
     console.log("Executing query:", query);
     console.log("With values:", values);
-    const res = await client.query(query, values);
+
+    // Execute the query
+    const res = await client.query<T>(query, values);
     return res.rows; // Return the rows from the query result
-  } catch (error: any) {
-    throw new Error(error.message);
+  } catch (error) {
+    // Log and throw a custom error
+    console.error("Error executing query:", error);
+    throw new Error(`Database query failed: ${error}`);
   } finally {
-    client.release(); // Release the client back to the pool
+    // Always release the client back to the pool
+    client.release();
   }
 }

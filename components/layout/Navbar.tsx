@@ -24,7 +24,7 @@ const Navigation = () => {
     status: string;
   };
 
-  console.log(session);
+  // console.log(session);
 
   const src =
     session?.user.s_image ||
