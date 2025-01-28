@@ -5,6 +5,7 @@ import { signOut, useSession } from "next-auth/react";
 import { Session } from "next-auth";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { BookOpenCheck, LogOut, User } from "lucide-react";
 
 interface ExtendedSession extends Session {
   user: {
@@ -53,7 +54,15 @@ const Navigation = () => {
             />
           </svg>
         </div>
-        <Link href={"/my"}>
+        <Link
+          href={{
+            pathname: session?.user.s_id
+              ? "/student"
+              : session?.user.t_id
+              ? "/teacher"
+              : "#",
+          }}
+        >
           {" "}
           <h1 className="font-bold text-3xl ml-10 hidden md:block cursor-pointer select-none">
             Learn&Grow
@@ -66,7 +75,15 @@ const Navigation = () => {
           }
         >
           <ul className="cursor-pointer select-none">
-            <Link href={{ pathname: "my" }}>
+            <Link
+              href={{
+                pathname: session?.user.s_id
+                  ? "/student"
+                  : session?.user.t_id
+                  ? "/teacher"
+                  : "#",
+              }}
+            >
               <li
                 className={
                   (open ? `px-6` : `justify-center px-2 ml-2`) +
@@ -90,7 +107,15 @@ const Navigation = () => {
                 {open && screen.width > 768 ? "Dashboard" : ""}
               </li>
             </Link>
-            <Link href={{ pathname: "/my" }}>
+            <Link
+              href={{
+                pathname: session?.user.s_id
+                  ? "/student"
+                  : session?.user.t_id
+                  ? "/teacher"
+                  : "#",
+              }}
+            >
               <li
                 className={
                   (open ? `px-6` : `justify-center px-2 ml-2`) +
@@ -115,7 +140,15 @@ const Navigation = () => {
               </li>
             </Link>
 
-            <Link href={{ pathname: "/my" }}>
+            <Link
+              href={{
+                pathname: session?.user.s_id
+                  ? "/student"
+                  : session?.user.t_id
+                  ? "/teacher"
+                  : "#",
+              }}
+            >
               <li
                 className={
                   (open ? `px-6` : `justify-center px-2 ml-2`) +
@@ -181,7 +214,7 @@ const Navigation = () => {
                        duration-300 bg-white group-hover:shadow-md cursor-pointer select-none"
           >
             <li className="flex items-center py-2 px-4 border-b-2 border-black bg-gray-100">
-              <svg
+              {/* <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -194,15 +227,23 @@ const Navigation = () => {
                   strokeLinejoin="round"
                   d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"
                 />
-              </svg>
+              </svg> */}
+              <User className="w-6 h-6 mr-4" />
               <p>
                 {status === "authenticated"
-                  ? 
-                    session?.user.s_name || session?.user.t_name
+                  ? session?.user.s_name || session?.user.t_name
                   : "Loading..."}
               </p>
             </li>
-            <Link href={{ pathname: session?.user.s_id ? "/student" : session?.user.t_id ? "/teacher" : "#" }}>
+            <Link
+              href={{
+                pathname: session?.user.s_id
+                  ? "/student"
+                  : session?.user.t_id
+                  ? "/teacher"
+                  : "#",
+              }}
+            >
               <li className="flex items-center py-2 px-4 hover:bg-gray-100">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -223,7 +264,7 @@ const Navigation = () => {
             </Link>
             <Link href={"/my/profile"}>
               <li className="flex items-center py-2 px-4 hover:bg-gray-100">
-                <svg
+                {/* <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -236,12 +277,13 @@ const Navigation = () => {
                     strokeLinejoin="round"
                     d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"
                   />
-                </svg>
+                </svg> */}
+                <User className="w-6 h-6 mr-4" strokeWidth={1.5} />
                 <p>Profile</p>
               </li>
             </Link>
             <li className="flex items-center py-2 px-4 hover:bg-gray-100">
-              <svg
+              {/* <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -254,14 +296,15 @@ const Navigation = () => {
                   strokeLinejoin="round"
                   d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"
                 />
-              </svg>
+              </svg> */}
+              <BookOpenCheck className="w-6 h-6 mr-4" strokeWidth={1.5} />
               <p>Grades</p>
             </li>
             <li
               className="flex items-center py-2 px-4 hover:bg-gray-100"
               onClick={() => void signOut({ callbackUrl: "/login" })}
             >
-              <svg
+              {/* <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -274,7 +317,8 @@ const Navigation = () => {
                   strokeLinejoin="round"
                   d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"
                 />
-              </svg>
+              </svg> */}
+              <LogOut className="w-6 h-6 mr-4" strokeWidth={1.5} />
               <p>Log out</p>
             </li>
           </ul>

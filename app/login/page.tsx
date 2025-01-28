@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { signIn } from "next-auth/react";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function SignIn() {
   const id = useRef<HTMLInputElement>(null);
@@ -10,6 +11,11 @@ export default function SignIn() {
   const [disable, setDisable] = useState(false);
   const [photoUrl, setPhotoUrl] = useState<string | null>(null); // To store fetched photo URL
   const [error, setError] = useState<string | null>(null); // State to store error messages
+  const [passwordVisible, setPasswordVisible] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setPasswordVisible(!passwordVisible);
+  };
 
   const accessKey = process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY; // Replace with your Unsplash API access key
   const url = `https://api.unsplash.com/photos/random?client_id=${accessKey}&count=1&query=study,books&w=300&h=320`;
@@ -52,7 +58,7 @@ export default function SignIn() {
         // console.error("Login failed:", result.error);
         setError("Invalid credentials. Try again!");
       } else {
-        // Redirect to the callback URL or any other route
+        // Redirect to the callback URL or any other route        
         window.location.href = result?.url || "/student";
       }
     } catch (error) {
@@ -94,7 +100,7 @@ export default function SignIn() {
 
             <div className="relative z-0 w-full mb-6 group">
               <input
-                type="password"
+                type={passwordVisible ? "text" : "password"} // Toggle password visibility
                 name="password"
                 id="my_password"
                 className="block py-3 px-0 w-full text-sm text-gray-900 bg-transparent border-b-2 border-gray-300 appearance-none focus:border-gray-600 focus:outline-none peer"
@@ -108,6 +114,18 @@ export default function SignIn() {
               >
                 Password
               </label>
+
+              {/* Eye Icon for Password Visibility Toggle */}
+              <div
+                className="absolute right-0 top-1/2 transform -translate-y-1/2 pr-3 cursor-pointer"
+                onClick={togglePasswordVisibility}
+              >
+                {passwordVisible ? (
+                  <EyeOff size={20} className="text-gray-600" />
+                ) : (
+                  <Eye size={20} className="text-gray-600" />
+                )}
+              </div>
             </div>
             <button
               type="submit"
