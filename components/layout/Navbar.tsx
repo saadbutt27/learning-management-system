@@ -25,7 +25,7 @@ const Navigation = () => {
     status: string;
   };
 
-  // console.log(session);
+  // console.log("Session: ", session);
 
   const src =
     session?.user.s_image ||
@@ -262,7 +262,13 @@ const Navigation = () => {
                 <p>Dashboard</p>
               </li>
             </Link>
-            <Link href={"/my/profile"}>
+            <Link href={{
+                pathname: session?.user.s_id
+                  ? "/student/profile"
+                  : session?.user.t_id
+                  ? "/teacher/profile"
+                  : "#",
+              }}>
               <li className="flex items-center py-2 px-4 hover:bg-gray-100">
                 {/* <svg
                   xmlns="http://www.w3.org/2000/svg"

@@ -39,7 +39,7 @@ export default function Home() {
             <p className="text-lg text-gray-600 mb-4">
               You are not logged in. Please log in to access your LMS.
             </p>
-            <Link href="/auth/signin">
+            <Link href="/login">
               <Button className="mt-4 bg-blue-500 hover:bg-blue-600 text-white">
                 Go to Login
               </Button>

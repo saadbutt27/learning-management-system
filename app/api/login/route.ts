@@ -40,5 +40,6 @@ export async function POST(request: NextRequest) {
     accessToken,
     role,
   };
+  // console.log("Result: ", result);
   return NextResponse.json(result);
 }
