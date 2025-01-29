@@ -28,45 +28,49 @@ export default function Studentpage() {
     data: ExtendedSession | null;
     status: string;
   };
-  
+
   const [courses, setCourses] = useState<CourseType[]>([]);
   const [complete, setComplete] = useState(false);
 
   // console.log(status);
 
-  useEffect(() => {    
+  useEffect(() => {
     // Fetch courses only when session is authenticated
     if (status === "authenticated") {
       const fetchCourses = async () => {
         if (status === "authenticated") {
           try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/student?s_id=${session?.user.s_id}`, {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-                Accept: "application/json",
-              },
-            });
-            
+            const res = await fetch(
+              `${process.env.NEXT_PUBLIC_URL}/api/student?s_id=${session?.user.s_id}`,
+              {
+                method: "GET",
+                headers: {
+                  "Content-Type": "application/json",
+                  Accept: "application/json",
+                },
+              }
+            );
+
             if (!res.ok) {
-              throw new Error(`Failed to fetch courses: ${res.status} ${res.statusText}`);
+              throw new Error(
+                `Failed to fetch courses: ${res.status} ${res.statusText}`
+              );
             }
-      
+
             const data = await res.json();
             // Set courses state and invert complete state
-            setCourses(data);  // Set fetched courses to state
-            setComplete((prev) => !prev);  // Invert the complete state
+            setCourses(data); // Set fetched courses to state
+            setComplete((prev) => !prev); // Invert the complete state
           } catch (error) {
             console.error("Error in getCourses:", error);
             return { error: "Failed to fetch courses" }; // Return an appropriate fallback or error object
           }
         }
       };
-      
 
-      fetchCourses();  // Call the fetchCourses function inside useEffect
+      fetchCourses(); // Call the fetchCourses function inside useEffect
     }
-  }, [status, session?.user.s_id]);  // Add session and status as dependencies
+  }, [status, session?.user.s_id]); // Add session and status as dependencies
 
   // Loading and authenticated state
   if (status !== "authenticated" || !session) {
@@ -103,7 +107,9 @@ export default function Studentpage() {
           <Avatar className="w-28 h-28 select-none">
             <AvatarImage
               src={
-                status === "authenticated" ? session?.user.s_image || "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" : "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
+                status === "authenticated"
+                  && session?.user.s_image ||
+                    "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
               }
               className="object-center object-cover"
             />
@@ -134,8 +140,15 @@ export default function Studentpage() {
           ))
         ) : (
           <>
-            <Skeleton className="w-full h-36 bg-gray-200" />
-            <Skeleton className="w-full h-36 bg-gray-200" />
+            {complete && courses.length === 0 ? (
+              <p className="flex justify-center items-center text-lg text-gray-600">No courses found.</p>
+            ) : (
+              <>
+                <Skeleton className="w-full h-36 bg-gray-200 mb-2" />
+                <Skeleton className="w-full h-36 bg-gray-200 mb-2" />
+                <Skeleton className="w-full h-36 bg-gray-200 mb-2" />
+              </>
+            )}
           </>
         )}
       </div>

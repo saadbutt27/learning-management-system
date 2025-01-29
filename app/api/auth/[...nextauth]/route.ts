@@ -56,7 +56,11 @@ const handler = NextAuth({
       // console.log('session: ', session.user)
       return session;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, trigger, session, user }) {
+        if (trigger === "update" && session?.name) {
+          // Note, that `session` can be any arbitrary object, remember to validate it!
+          token.name = session.name
+        }
       return { ...token, ...user };
     },
   },

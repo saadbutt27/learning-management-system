@@ -41,7 +41,7 @@ const CourseComponent = ({
   student_id,
   semester_num,
   section,
-  program_name
+  program_name,
 }: Props) => {
   return (
     <>

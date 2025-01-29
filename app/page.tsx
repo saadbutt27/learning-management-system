@@ -9,6 +9,9 @@ interface ExtendedSession extends Session {
     s_id: string;
     s_name: string;
     s_image?: string;
+    t_id: string;
+    t_name: string;
+    t_image?: string;
   } & Session["user"];
 }
 
@@ -23,7 +26,7 @@ export default function Home() {
       <div className="text-center p-6 bg-white rounded-lg shadow-md w-full max-w-md">
         <h1 className="text-3xl font-semibold text-gray-800 mb-4">LMS - Learning Management System</h1>
         {session ? (
-          <>
+          <div className="flex flex-col items-center gap-x-2">
             <p className="text-lg text-gray-700 mb-4">
               Welcome, {session?.user?.s_name}! You are logged in.
             </p>
@@ -33,7 +36,12 @@ export default function Home() {
             >
               Logout
             </Button>
-          </>
+            <Link href={session.user.t_id ? "/teacher" : "/student"}>
+              <Button className="mt-4 bg-blue-500 hover:bg-blue-600 text-white">
+                Go to Dashboard
+              </Button>
+            </Link>
+          </div>
         ) : (
           <>
             <p className="text-lg text-gray-600 mb-4">

@@ -51,6 +51,7 @@ export async function DELETE(request: NextRequest) {
   // Get the file name from query parameters
   const searchParams = request.nextUrl.searchParams;
   const fileName = searchParams.get("fileName");
+  console.log("Filename: ", fileName);
 
   // Validate the file name
   if (!fileName) {
@@ -77,6 +78,7 @@ export async function DELETE(request: NextRequest) {
   try {
     // Execute the command
     await client.send(command);
+    // console.log("File deleted successfully", response.$metadata, response.DeleteMarker, response.VersionId, response.RequestCharged);
 
     // Respond with success
     return NextResponse.json({ message: "File deleted successfully" });
