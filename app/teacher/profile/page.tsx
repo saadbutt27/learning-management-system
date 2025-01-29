@@ -19,14 +19,8 @@ interface UserProfile {
   // userPassword: string;
 }
 
-// interface IImage {
-//   fileUrl: string;
-//   fileKey: string;
-// }
-
 export default function ProfilePage() {
   const [password, setPassword] = useState(false);
-  // const [image, setImage] = useState<IImage[] | null>(null);
   const {
     data: session,
     status,
@@ -35,9 +29,9 @@ export default function ProfilePage() {
     data: ExtendedSession | null;
     status: string;
     update: () => Promise<Session | null>;
+    // update: (data: any) => Promise<Session | null>;
   };
   const [user, setUser] = useState<UserProfile | null>(null);
-  //   const router = useRouter();
   const [passUpdated, setPassUpdated] = useState<string | null>(null);
   const [passMatched, setPassMatched] = useState(true);
 
@@ -86,10 +80,14 @@ export default function ProfilePage() {
                   }),
                 }
               );
+              // .then(async () => {
+              //   // Update user profile with the new file reference
+              //   // update({ user: { s_image: res.signedUrl.split("?")[0] } });
+              // });
             });
-            if (user) {
-              user.t_image = res.signedUrl.split("?")[0]; // Update the UI
-            }
+            // if (user) {
+            //   user.t_image = res.signedUrl.split("?")[0]; // Update the UI
+            // }
           });
       }
     };
@@ -98,108 +96,74 @@ export default function ProfilePage() {
 
   const handleDeleteProfilePic = async () => {
     try {
-      //   const response = await fetch(
-      //     `/api/presigned?fileName=${encodeURIComponent(fileName)}`,
-      //     {
-      //       method: "DELETE",
-      //     }
-      //   );
-
-      //   if (!response.ok) {
-      //     const errorData = await response.json();
-      //     console.error("Failed to delete file:", errorData.error);
-      //     return { success: false, error: errorData.error };
-      //   }
-
-      //   const data = await response.json();
-      await fetch(
-        `${process.env.NEXT_PUBLIC_SITE_URL}/api/teacher_profile?t_id=${session?.user.t_id}`,
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/api/presigned?fileName=${user?.t_image
+          ?.split("/")
+          .pop()}`,
         {
           method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
         }
-      ).then(async () => {
-        // The session is not being updated after deletion
-        await update();
-      });
-      //   console.log("File deleted successfully:", data.message);
-      //   return { success: true, message: data.message };
+      );
+
+      if (response.ok) {
+        // Delete profile picture reference in Postgres (powered by Neon)
+        await fetch(
+          `${process.env.NEXT_PUBLIC_URL}/api/teacher_profile?s_id=${session?.user.t_id}`,
+          {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        // .then(async () => {
+        //   // Update user profile with the new file reference
+        //   update({ user: { s_image: null } });
+        // });
+      } else {
+        throw new Error("Failed to delete profile picture");
+      }
     } catch (error) {
       console.error("Error deleting file:", error);
-      //   return { success: false, error: error.message };
     }
   };
 
-  //   const handleUpdateProfile = (e: React.FormEvent<HTMLFormElement>) => {
-  //     e.preventDefault();
-
-  //     let deleteCheckbox = (e.target as HTMLFormElement).deleteCheckbox.checked;
-  //     if (image && image[0]) {
-  //       const res = fetch(
-  //         `http://localhost:3000/api/student_profile?s_id=${session?.user.s_id}`,
-  //         {
-  //           method: "PUT",
-  //           headers: {
-  //             "Content-Type": "application/json",
-  //           },
-  //           body: JSON.stringify({ image: image[0].fileUrl, s_id: user?.s_id }),
-  //         }
-  //       ).then((data) => {
-  //         (e.target as HTMLFormElement).deleteCheckbox.checked = false;
-  //         setImage(null);
-  //         update();
-  //       });
-  //     } else if (deleteCheckbox) {
-  //       const res = fetch(
-  //         `http://localhost:3000/api/student_profile?s_id=${session?.user.s_id}`,
-  //         {
-  //           method: "DELETE",
-  //           headers: {
-  //             "Content-Type": "application/json",
-  //           },
-  //         }
-  //       ).then((data) => {
-  //         (e.target as HTMLFormElement).deleteCheckbox.checked = false;
-  //         update();
-  //       });
-  //     }
-  //   };
-
-  const handlePasswordReset = (e: React.FormEvent<HTMLFormElement>) => {
+  const handlePasswordReset = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setPassMatched(true);
     setPassUpdated(null);
 
-    if (
-      (e.target as HTMLFormElement).newPass.value !==
-      (e.target as HTMLFormElement).cnfNewPass.value
-    ) {
+    const newPassword = (e.target as HTMLFormElement).newPass.value;
+    const confirmPassword = (e.target as HTMLFormElement).cnfNewPass.value;
+
+    if (newPassword !== confirmPassword) {
       setPassMatched(false);
       return;
     }
 
-    fetch(`/api/teacher_profile`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify({
-        s_id: session?.user.t_id,
-        oldPassword: (e.target as HTMLFormElement).oldPass.value,
-        newPassword: (e.target as HTMLFormElement).newPass.value,
-      }),
-    })
-      .then((data) => data.json())
-      .then((data) => {
-        if (data) {
-          setPassUpdated("changed");
-        } else {
-          setPassUpdated("incorrect");
-        }
+    try {
+      const res = await fetch(`/api/teacher_profile`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          s_id: session?.user.t_id,
+          oldPassword: (e.target as HTMLFormElement).oldPass.value,
+          newPassword: newPassword,
+        }),
       });
+      const data = await res.json();
+      if (data) {
+        setPassUpdated("changed");
+      } else {
+        setPassUpdated("incorrect");
+      }
+    } catch (err) {
+      console.error("Error resetting password:", err);
+      setPassUpdated("error");
+    }
   };
 
   if (user) {
@@ -264,37 +228,15 @@ export default function ProfilePage() {
                     />
                     <AvatarFallback>Profile Picture</AvatarFallback>
                   </Avatar>
-                  <div className="flex items-center">
-                    {/* <input
-                      id="checkbox-1"
-                      type="checkbox"
-                      value=""
-                      name="deleteCheckbox"
-                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                      disabled={
-                        src ===
-                        "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
-                      }
-                    />
-                    <label
-                      htmlFor="checkbox-1"
-                      className={
-                        (src ===
-                        "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
-                          ? ` opacity-70 `
-                          : ` opacity-100 `) +
-                        `ml-2 text-sm font-medium text-gray-900 dark:text-gray-300 select-none`
-                      }
+                  <div className="flex items-center"></div>
+                  {user.t_image && (
+                    <button
+                      className="mb-6 bg-gray-900 hover:bg-gray-900 hover:scale-110 hover:duration-200 text-white w-auto font-medium rounded-md text-sm px-2 py-1"
+                      onClick={handleDeleteProfilePic}
                     >
                       Delete picture
-                    </label> */}
-                  </div>
-                  <button
-                    className="mb-6 bg-gray-900 hover:bg-gray-900 hover:scale-110 hover:duration-200 text-white w-auto font-medium rounded-md text-sm px-2 py-1"
-                    onClick={handleDeleteProfilePic}
-                  >
-                    Delete picture
-                  </button>
+                    </button>
+                  )}
                 </div>
               </div>
               <div className="my-6 flex sm:flex-row flex-col sm:items-center sm:justify-between">
@@ -305,15 +247,9 @@ export default function ProfilePage() {
                   New Picture{" "}
                 </label>
                 <div className="flex items-start gap-x-2">
-                  <input onChange={uploadFile} type="file" />;
-                  {/* {image && (
-                    <p className="text-4xl text-green-500 duration-500">✔</p>
-                  )} */}
+                  <input onChange={uploadFile} type="file" />
                 </div>
               </div>
-              {/* <button className="mb-6 bg-gray-900 hover:bg-gray-900 hover:scale-110 hover:duration-200 text-white w-auto font-medium rounded-lg text-sm px-4 py-2">
-                Update Profile
-              </button> */}
             </form>
             <button
               className="mb-2 text-base font-medium text-gray-900 underline"
@@ -388,10 +324,7 @@ export default function ProfilePage() {
                     )}
                   </div>
                 </div>
-                <button
-                  // type="submit"
-                  className="text-white bg-black hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center"
-                >
+                <button className="text-white bg-black hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">
                   Set password
                 </button>
               </form>

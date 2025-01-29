@@ -1,9 +1,6 @@
 "use client";
 import React, { useState, useEffect, ChangeEvent } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-// import { UploadButton } from "@uploadthing/react";
-// import { OurFileRouter } from "../../api/uploadthing/core";
-// import "@uploadthing/react/styles.css";
 import { useSession } from "next-auth/react";
 import { Session } from "next-auth";
 
@@ -24,14 +21,8 @@ interface UserProfile {
   semester_num: string;
 }
 
-// interface IImage {
-//   fileUrl: string;
-//   fileKey: string;
-// }
-
 export default function ProfilePage() {
   const [password, setPassword] = useState(false);
-  // const [image] = useState<IImage[] | null>(null);
   const {
     data: session,
     status,
@@ -39,13 +30,13 @@ export default function ProfilePage() {
   } = useSession() as {
     data: ExtendedSession | null;
     status: string;
-    update: () => Promise<Session | null>;
+    update: (data: any) => Promise<Session | null>;
   };
   const [user, setUser] = useState<UserProfile | null>(null);
   const [passUpdated, setPassUpdated] = useState<string | null>(null);
   const [passMatched, setPassMatched] = useState(true);
 
-  //   console.log("Session(profile):", session);
+  console.log("Session(profile):", session);
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -89,7 +80,10 @@ export default function ProfilePage() {
                     objectUrl: res.signedUrl.split("?")[0],
                   }),
                 }
-              );
+              ).then(async () => {
+                // Update user profile with the new file reference
+                update({ user: { s_image: res.signedUrl.split("?")[0] } });
+              });
             });
             if (user) {
               user.s_image = res.signedUrl.split("?")[0]; // Update the UI
@@ -126,10 +120,37 @@ export default function ProfilePage() {
         }
       ).then(async () => {
         // The session is not being updated after deletion
-        await update();
+        // await update();
       });
       //   console.log("File deleted successfully:", data.message);
       //   return { success: true, message: data.message };
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/api/presigned?fileName=${user?.s_image
+          ?.split("/")
+          .pop()}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (response.ok) {
+        // Delete profile picture reference in Postgres (powered by Neon)
+        await fetch(
+          `${process.env.NEXT_PUBLIC_URL}/api/student_profile?s_id=${session?.user.s_id}`,
+          {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        )
+        // .then(async () => {
+        //   // Update user profile with the new file reference
+        //   update({ user: { s_image: null } });
+        // });
+      } else {
+        throw new Error("Failed to delete profile picture");
+      }
     } catch (error) {
       console.error("Error deleting file:", error);
       //   return { success: false, error: error.message };
@@ -425,7 +446,6 @@ export default function ProfilePage() {
                   </div>
                 </div>
                 <button
-                  // type="submit"
                   className="text-white bg-black hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center"
                 >
                   Set password
