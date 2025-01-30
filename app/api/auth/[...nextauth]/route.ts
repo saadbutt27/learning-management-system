@@ -51,17 +51,23 @@ const handler = NextAuth({
     maxAge: 1 * 60 * 60,
   },
   callbacks: {
+    async jwt({ token, trigger, session, user }) {
+      if (user) {
+        // token.s_image = user.s_image; // Initial login
+      }
+      // console.log("trigger: ", trigger);
+      if (trigger === "update") {
+        // console.log('session update: ', session)
+        token.s_image = session.user.s_image; // Update profile image
+      }
+      return { ...token, ...user };
+    },
     async session({ session, token }) {
+      // console.log("Token: ", token);  
       session.user = token;
+      // session.user.s_image = token.s_image; 
       // console.log('session: ', session.user)
       return session;
-    },
-    async jwt({ token, trigger, session, user }) {
-        if (trigger === "update" && session?.name) {
-          // Note, that `session` can be any arbitrary object, remember to validate it!
-          token.name = session.name
-        }
-      return { ...token, ...user };
     },
   },
   pages: {

@@ -78,7 +78,7 @@ export async function PATCH(req: NextRequest) {
 
   if (res[0]) {
     await query({
-      query: "UPDATE teacher SET password = $1 WHERE s_id = $2",
+      query: "UPDATE teacher SET password = $1 WHERE t_id = $2",
       values: [newPassword!, t_id!],
     });
 

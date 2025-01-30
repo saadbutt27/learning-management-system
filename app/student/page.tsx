@@ -30,47 +30,47 @@ export default function Studentpage() {
   };
 
   const [courses, setCourses] = useState<CourseType[]>([]);
-  const [complete, setComplete] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Track loading state
 
   // console.log(status);
 
   useEffect(() => {
     // Fetch courses only when session is authenticated
-    if (status === "authenticated") {
+    if (status === "authenticated" && courses.length === 0) {
       const fetchCourses = async () => {
-        if (status === "authenticated") {
-          try {
-            const res = await fetch(
-              `${process.env.NEXT_PUBLIC_URL}/api/student?s_id=${session?.user.s_id}`,
-              {
-                method: "GET",
-                headers: {
-                  "Content-Type": "application/json",
-                  Accept: "application/json",
-                },
-              }
-            );
-
-            if (!res.ok) {
-              throw new Error(
-                `Failed to fetch courses: ${res.status} ${res.statusText}`
-              );
+        setIsLoading(true); // Set loading state to true
+        try {
+          const res = await fetch(
+            `${process.env.NEXT_PUBLIC_URL}/api/student?s_id=${session?.user.s_id}`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+              },
             }
+          );
 
-            const data = await res.json();
-            // Set courses state and invert complete state
-            setCourses(data); // Set fetched courses to state
-            setComplete((prev) => !prev); // Invert the complete state
-          } catch (error) {
-            console.error("Error in getCourses:", error);
-            return { error: "Failed to fetch courses" }; // Return an appropriate fallback or error object
+          if (!res.ok) {
+            throw new Error(
+              `Failed to fetch courses: ${res.status} ${res.statusText}`
+            );
           }
+
+          const data = await res.json();
+          // Set courses state and invert complete state
+          setCourses(data); // Set fetched courses to state
+        } catch (error) {
+          console.error("Error in getCourses:", error);
+          return { error: "Failed to fetch courses" }; // Return an appropriate fallback or error object
+        } finally {
+          setIsLoading(false); // Set loading state to false
         }
       };
 
       fetchCourses(); // Call the fetchCourses function inside useEffect
     }
-  }, [status, session?.user.s_id]); // Add session and status as dependencies
+  }, [status, session?.user.s_id, courses.length]); // Add session and status as dependencies
 
   // Loading and authenticated state
   if (status !== "authenticated" || !session) {
@@ -102,29 +102,32 @@ export default function Studentpage() {
   // Once the courses are fetched and complete
   return (
     <div className="md:ml-[90px] mx-6">
-      {complete ? (
-        <div className="my-4 p-4 bg-white border-2 shadow-md h-52 flex flex-col sm:flex-row items-start">
-          <Avatar className="w-28 h-28 select-none">
-            <AvatarImage
-              src={
-                status === "authenticated"
-                  && session?.user.s_image ||
-                    "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
-              }
-              className="object-center object-cover"
-            />
-            <AvatarFallback>Profile Picture</AvatarFallback>
-          </Avatar>
-          <p className="text-3xl sm:text-4xl sm:ml-4 font-medium tracking-normal leading-relaxed select-none">
+      <div className="my-4 px-5 py-8 bg-white border-2 shadow-md flex flex-col sm:flex-row items-start">
+        <Avatar className="w-28 h-28 select-none">
+          <AvatarImage
+            src={
+              session?.user.s_image ||
+              "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
+            }
+            className="object-center object-cover"
+          />
+          <AvatarFallback>Profile Picture</AvatarFallback>
+        </Avatar>
+        <div className="flex flex-col items-start justify-center sm:ml-4">
+          <p className="text-3xl sm:text-4xl mt-4 font-medium tracking-normal leading-relaxed select-none">
             {session?.user.s_name}
           </p>
         </div>
-      ) : (
-        <Skeleton className="w-full h-52 bg-gray-200" />
-      )}
+      </div>
       <div className="border-2 border-t-2 border-t-black p-4 select-none">
         <p className="p-3 text-lg">Course Overview</p>
-        {complete && courses.length > 0 ? (
+        {isLoading ? ( // Show skeletons while loading
+          <>
+            <Skeleton className="w-full h-36 bg-gray-200 mb-2" />
+            <Skeleton className="w-full h-36 bg-gray-200 mb-2" />
+            <Skeleton className="w-full h-36 bg-gray-200 mb-2" />
+          </>
+        ) : courses.length > 0 ? ( // Show courses if data is fetched
           courses.map((course: CourseType) => (
             <CourseComponent
               key={course.course_id}
@@ -134,22 +137,15 @@ export default function Studentpage() {
               student_id={session.user.s_id}
               semester_num={course.semester_num}
               section={course.section}
-              course_value={"70"}
+              // course_value={"70"}
               program_name={course.program_name}
             />
           ))
         ) : (
-          <>
-            {complete && courses.length === 0 ? (
-              <p className="flex justify-center items-center text-lg text-gray-600">No courses found.</p>
-            ) : (
-              <>
-                <Skeleton className="w-full h-36 bg-gray-200 mb-2" />
-                <Skeleton className="w-full h-36 bg-gray-200 mb-2" />
-                <Skeleton className="w-full h-36 bg-gray-200 mb-2" />
-              </>
-            )}
-          </>
+          // Show message if no courses are found
+          <p className="flex justify-center items-center text-lg text-gray-600">
+            No courses found.
+          </p>
         )}
       </div>
     </div>

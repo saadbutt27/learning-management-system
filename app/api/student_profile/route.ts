@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { query } from "@/lib/db";
-import { getSession } from "next-auth/react";
+// import { getSession } from "next-auth/react";
 
 export async function GET(req: NextRequest) {
   try {
@@ -27,16 +27,16 @@ export async function PUT(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const { s_id } = { s_id: searchParams.get("s_id") };
   const { objectUrl } = await request.json();
-  const session = await getSession();
+  // const session = await getSession();
   try {
     // Update to store the reference to the profile picture into the student table
     await query({
       query: "UPDATE student SET s_image = $1 WHERE s_id = $2",
       values: [objectUrl, s_id],
     });
-    if (session?.user) {
-      session.user.image = objectUrl;
-    }
+    // if (session?.user) {
+    //   session.user.image = objectUrl;
+    // }
     return NextResponse.json({ code: 1 });
   } catch (e) {
     return NextResponse.json({
@@ -48,18 +48,20 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const { s_id } = { s_id: searchParams.get("s_id") };
-  const session = await getSession();
+  const s_id = searchParams.get("s_id");
+  // const session = await getSession();
   //   const { objectUrl } = await request.json();
+  console.log("s_id: ", s_id);
   try {
     // Update to store the reference to the profile picture into the student table
     await query({
-      query: "UPDATE student SET s_image = null WHERE s_id = $1",
+      query: "UPDATE student SET s_image = NULL WHERE s_id = $1",
       values: [s_id],
     });
-    if (session?.user) {
-      session.user.image = null;
-    }
+    // if (session?.user) {
+    //   session.user.image = null;
+    // }
+    console.log("Deleted from databse");
     return NextResponse.json({ code: 1 });
   } catch (e) {
     return NextResponse.json({

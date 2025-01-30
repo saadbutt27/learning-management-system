@@ -22,25 +22,28 @@ export default function Home() {
     };
 
   return (
-    <div className="flex flex-col justify-center items-center h-screen bg-gray-100">
+    <div className="flex flex-col justify-center items-center h-screen bg-gray-100 p-10">
       <div className="text-center p-6 bg-white rounded-lg shadow-md w-full max-w-md">
         <h1 className="text-3xl font-semibold text-gray-800 mb-4">LMS - Learning Management System</h1>
         {session ? (
           <div className="flex flex-col items-center gap-x-2">
             <p className="text-lg text-gray-700 mb-4">
-              Welcome, {session?.user?.s_name}! You are logged in.
+              Welcome back, {session?.user?.s_name}! You are logged in.
             </p>
-            <Button
-              className="mt-4 bg-red-500 hover:bg-red-600 text-white"
-              onClick={() => signOut({ callbackUrl: "/" })}
-            >
-              Logout
-            </Button>
-            <Link href={session.user.t_id ? "/teacher" : "/student"}>
-              <Button className="mt-4 bg-blue-500 hover:bg-blue-600 text-white">
-                Go to Dashboard
+            <div className="flex sm:flex-row flex-col sm:items-baseline items-center gap-2">
+              <Link href={session.user.t_id ? "/teacher" : "/student"}>
+                <Button className="mt-4 bg-blue-500 hover:bg-blue-600 text-white">
+                  Go to Dashboard
+                </Button>
+              </Link>
+              <p className="text-xl font-bold">OR</p>
+              <Button
+                className="bg-red-500 hover:bg-red-600 text-white"
+                onClick={() => signOut({ callbackUrl: "/" })}
+              >
+                Logout
               </Button>
-            </Link>
+            </div>
           </div>
         ) : (
           <>

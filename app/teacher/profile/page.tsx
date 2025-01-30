@@ -28,12 +28,13 @@ export default function ProfilePage() {
   } = useSession() as {
     data: ExtendedSession | null;
     status: string;
-    update: () => Promise<Session | null>;
-    // update: (data: any) => Promise<Session | null>;
+    // update: () => Promise<Session | null>;
+    update: <T>(data: T) => Promise<Session | null>;
   };
   const [user, setUser] = useState<UserProfile | null>(null);
   const [passUpdated, setPassUpdated] = useState<string | null>(null);
   const [passMatched, setPassMatched] = useState(true);
+  const [uploading, setUploading] = useState(false);
 
   //   console.log("Session(profile):", session);
 
@@ -45,56 +46,65 @@ export default function ProfilePage() {
         .then((data) => data.json())
         .then((data) => setUser(data));
     }
-  }, [status]);
+  }, [status, session?.user.t_id]);
 
   const uploadFile = (e: ChangeEvent<HTMLInputElement>) => {
     const file: File | null | undefined = e.target.files?.[0];
     if (!file) return;
+    setUploading(true);
     const reader = new FileReader();
     reader.onload = async (event) => {
       const fileData = event.target?.result;
       if (fileData) {
-        // Fetch presigned URL and save reference in Postgres (powered by Neon)
-        const presignedURL = new URL(
-          `${process.env.NEXT_PUBLIC_URL}/api/presigned`,
-          window.location.href
-        );
-        presignedURL.searchParams.set("fileName", file.name);
-        presignedURL.searchParams.set("contentType", file.type);
-        fetch(presignedURL.toString())
-          .then((res) => res.json())
-          .then((res) => {
-            const body = new Blob([fileData], { type: file.type });
-            fetch(res.signedUrl, {
-              body,
-              method: "PUT",
-            }).then(() => {
-              // Save reference to the object in Postgres (powered by Neon)
-              fetch(
-                `${process.env.NEXT_PUBLIC_URL}/api/teacher_profile?t_id=${session?.user.t_id}`,
-                {
-                  method: "PUT",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    objectUrl: res.signedUrl.split("?")[0],
-                  }),
-                }
-              );
-              // .then(async () => {
-              //   // Update user profile with the new file reference
-              //   // update({ user: { s_image: res.signedUrl.split("?")[0] } });
-              // });
+        try {
+          // Fetch presigned URL and save reference in Postgres (powered by Neon)
+          const presignedURL = new URL(
+            `${process.env.NEXT_PUBLIC_URL}/api/presigned`,
+            window.location.href
+          );
+          presignedURL.searchParams.set("fileName", file.name);
+          presignedURL.searchParams.set("contentType", file.type);
+          fetch(presignedURL.toString())
+            .then((res) => res.json())
+            .then((res) => {
+              const body = new Blob([fileData], { type: file.type });
+              fetch(res.signedUrl, {
+                body,
+                method: "PUT",
+              }).then(() => {
+                // Save reference to the object in Postgres (powered by Neon)
+                fetch(
+                  `${process.env.NEXT_PUBLIC_URL}/api/teacher_profile?t_id=${session?.user.t_id}`,
+                  {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      objectUrl: res.signedUrl.split("?")[0],
+                    }),
+                  }
+                ).then(async () => {
+                  // Update user profile with the new file reference
+                  // update({ user: { s_image: res.signedUrl.split("?")[0] } });
+                  await update({
+                    user: { s_image: res.signedUrl.split("?")[0] },
+                  }); // <=== Updating session here
+                });
+              });
+              setUploading(false);
+              e.target.value = "";
             });
-            // if (user) {
-            //   user.t_image = res.signedUrl.split("?")[0]; // Update the UI
-            // }
-          });
+        } catch (error) {
+          console.error("Error uploading file:", error);
+        }
       }
     };
     reader.readAsArrayBuffer(file);
   };
 
-  const handleDeleteProfilePic = async () => {
+  const handleDeleteProfilePic = async (
+    e: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    e.preventDefault(); // Prevent default form submission behavior
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_URL}/api/presigned?fileName=${user?.t_image
@@ -104,6 +114,8 @@ export default function ProfilePage() {
           method: "DELETE",
         }
       );
+
+      // console.log(response);
 
       if (response.ok) {
         // Delete profile picture reference in Postgres (powered by Neon)
@@ -115,11 +127,10 @@ export default function ProfilePage() {
               "Content-Type": "application/json",
             },
           }
-        );
-        // .then(async () => {
-        //   // Update user profile with the new file reference
-        //   update({ user: { s_image: null } });
-        // });
+        ).then(async () => {
+          // Update user profile with the new file reference
+          await update({ user: { t_image: null } });
+        });
       } else {
         throw new Error("Failed to delete profile picture");
       }
@@ -132,6 +143,8 @@ export default function ProfilePage() {
     e.preventDefault();
     setPassMatched(true);
     setPassUpdated(null);
+
+    const form = e.target as HTMLFormElement;
 
     const newPassword = (e.target as HTMLFormElement).newPass.value;
     const confirmPassword = (e.target as HTMLFormElement).cnfNewPass.value;
@@ -149,7 +162,7 @@ export default function ProfilePage() {
           Accept: "application/json",
         },
         body: JSON.stringify({
-          s_id: session?.user.t_id,
+          t_id: session?.user.t_id,
           oldPassword: (e.target as HTMLFormElement).oldPass.value,
           newPassword: newPassword,
         }),
@@ -157,6 +170,7 @@ export default function ProfilePage() {
       const data = await res.json();
       if (data) {
         setPassUpdated("changed");
+        form.reset(); // Clears the input fields after success
       } else {
         setPassUpdated("incorrect");
       }
@@ -247,8 +261,15 @@ export default function ProfilePage() {
                   New Picture{" "}
                 </label>
                 <div className="flex items-start gap-x-2">
-                  <input onChange={uploadFile} type="file" />
+                  <input
+                    onChange={uploadFile}
+                    type="file"
+                    disabled={uploading}
+                  />
                 </div>
+                {uploading && (
+                  <p className="text-lg text-semibold">Uploading...</p>
+                )}
               </div>
             </form>
             <button
