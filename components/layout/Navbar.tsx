@@ -70,7 +70,7 @@ const Navigation = () => {
         </Link>
         <div
           className={
-            (open ? `w-20 md:w-64` : `w-0 md:w-20`) +
+            (open ? `w-20 md:w-72` : `w-0 md:w-20`) +
             ` fixed left-0 top-[82px] h-full bg-white duration-500 shadow-2xl`
           }
         >
@@ -86,7 +86,7 @@ const Navigation = () => {
             >
               <li
                 className={
-                  (open ? `px-6` : `justify-center px-2 ml-2`) +
+                  (open ? `px-6` : `justify-center`) +
                   ` flex items-center py-4 bg-white`
                 }
               >
@@ -118,7 +118,7 @@ const Navigation = () => {
             >
               <li
                 className={
-                  (open ? `px-6` : `justify-center px-2 ml-2`) +
+                  (open ? `px-6` : `justify-center`) +
                   ` flex items-center py-4 bg-white`
                 }
               >
@@ -151,7 +151,7 @@ const Navigation = () => {
             >
               <li
                 className={
-                  (open ? `px-6` : `justify-center px-2 ml-2`) +
+                  (open ? `px-6` : `justify-center`) +
                   ` flex items-center py-4 bg-white`
                 }
               >
@@ -174,7 +174,7 @@ const Navigation = () => {
             </Link>
             <li
               className={
-                (open ? `px-6` : `justify-center px-2 ml-2`) +
+                (open ? `px-6` : `justify-center`) +
                 ` flex items-center py-4 bg-white`
               }
             >
