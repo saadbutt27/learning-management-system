@@ -63,14 +63,16 @@ const CourseComponent = ({
             <div
               className={`${generateGrad()} w-20 h-20 rounded-full flex items-center justify-center`}
             >
-              <span className="text-white font-bold text-2xl">{initials}</span>
+              <span className={`text-white font-bold ${
+                initials.length > 4 ? 'text-lg' : 'text-2xl'
+              }`}>{initials}</span>
             </div>
           </div>
           <span className="mt-2">
             <p className="text-xs sm:text-sm">{program_name}</p>
             <Link
               href={{
-                pathname: "/student/course/assignment",
+                pathname: `/student/mycourse/${course_name}`,
                 query: { course_id, teacher_id, student_id },
               }}
             >
