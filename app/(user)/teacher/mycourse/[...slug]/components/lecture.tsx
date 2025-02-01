@@ -36,7 +36,7 @@ export default function Lecture() {
   useEffect(() => {
     if (status === "authenticated") {
       fetch(
-        `http://localhost:3000/api/lecture_teacher?course_id=${course_id}&teacher_id=${teacher_id}`,
+        `${process.env.NEXT_PUBLIC_URL}/api/lecture_teacher?course_id=${course_id}&teacher_id=${teacher_id}`,
         {
           method: "GET",
           headers: {
