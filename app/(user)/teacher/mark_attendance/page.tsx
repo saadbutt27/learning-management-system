@@ -1,13 +1,20 @@
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 
 interface Student {
   id: string;
   name: string;
 }
-
 export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <MarkAttendance />
+    </Suspense>
+  );
+}
+
+function MarkAttendance() {
   const [attendance, setAttendance] = useState<
     Record<string, boolean | number>
   >({});
@@ -21,19 +28,16 @@ export default function Page() {
   const router = useRouter();
 
   useEffect(() => {
-    fetch(
-      `${process.env.NEXT_PUBLIC_URL}/api/attendance_course_student`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({
-          c_id,
-        }),
-      }
-    )
+    fetch(`${process.env.NEXT_PUBLIC_URL}/api/attendance_course_student`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        c_id,
+      }),
+    })
       .then((data) => data.json())
       .then((data) => setStudents(data))
       .then(() => setInitial(true));
@@ -45,6 +49,7 @@ export default function Page() {
       [studentId]: status,
     }));
   };
+
   const handleSelectAll = (selectAll: boolean, caller: boolean | number) => {
     const updatedAttendance: Record<string, boolean | number> = {};
 

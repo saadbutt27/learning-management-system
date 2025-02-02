@@ -5,6 +5,13 @@ export async function POST(request: NextRequest) {
   try {
     const { c_id } = await request.json();
 
+    if (c_id) {
+      return NextResponse.json(
+        { error: "Course ID is required" },
+        { status: 400 }
+      );
+    }
+
     const res = await query({
       query: `SELECT s.s_id as id, s.s_name as name FROM student s
         JOIN enroll_assign e ON e.s_id = s.s_id 

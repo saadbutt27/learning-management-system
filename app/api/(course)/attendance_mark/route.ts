@@ -5,6 +5,20 @@ export async function POST(request: NextRequest) {
   try {
     const { a_id, attendance } = await request.json();
 
+    if (!a_id) {
+      return NextResponse.json(
+        { error: "Attendance ID is required" },
+        { status: 400 }
+      );
+    }
+
+    if (attendance) {
+        return NextResponse.json(
+            { error: "Attendance is required" },
+            { status: 400 }
+          );
+    }
+
     let myQuery =
       "INSERT INTO mark_attendance (s_id, a_id, attendance_state) VALUES";
 
