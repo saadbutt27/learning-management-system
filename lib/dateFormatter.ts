@@ -1,7 +1,8 @@
 export const formatDateTime = (dateTime: string) => {
-  const dat: string = new Date(dateTime).toString();
+  const date = new Date(dateTime);
+  const utcDate = new Date(date.getTime() + date.getTimezoneOffset() * 60000); // Convert to UTC
+  const dat: string = utcDate.toString();
   const dateTimeParts: string[] = dat.split(/[ ]/);
-
   return `${dateTimeParts[1]} ${dateTimeParts[2]} ${
     dateTimeParts[3]
   } ${tConvert(dateTimeParts[4])}`;
@@ -22,7 +23,7 @@ function tConvert(time: string) {
   if (matechedTime.length > 1) {
     // If matechedTime format correct
     matechedTime = matechedTime.slice(1); // Remove full string match value
-    matechedTime[5] = +matechedTime[0] < 12 ? "AM" : "PM"; // Set AM/PM
+    matechedTime[5] = +matechedTime[0] < 12 ? " AM" : " PM"; // Set AM/PM
     matechedTime[0] = (+matechedTime[0] % 12 || 12).toString(); // Adjust hours
   }
   return matechedTime.join(""); // return adjusted time or original string

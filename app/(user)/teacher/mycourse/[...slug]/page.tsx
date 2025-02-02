@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
-import Lecture from "./components/lecture";
-
+import Lecture from "./components/lecture/Lecture";
+import Attendance from "./components/attendance/Attendance";
 
 export default function Page() {
   const pathName = usePathname();
@@ -27,6 +27,30 @@ export default function Page() {
           <Lecture />
         </div>
       ); // Pass necessary props to Lecture component
+    } else if (activeButton === "attendance") {
+      return (
+        <div className="border-2 h-full mt-4 duration-500 p-4">
+          <Attendance />
+        </div>
+      );
+    } else if (activeButton === "assignment") {
+      return (
+        <div className="border-2 h-full mt-4 duration-500 p-4">
+          {/* <Assignment /> */}
+        </div>
+      );
+    } else if (activeButton === "quiz") {
+      return (
+        <div className="border-2 h-full mt-4 duration-500 p-4">
+          {/* <Quiz /> */}
+        </div>
+      );
+    } else if (activeButton === "announcement") {
+      return (
+        <div className="border-2 h-full mt-4 duration-500 p-4">
+          {/* <Announcement /> */}
+        </div>
+      );
     }
 
     return (
@@ -54,9 +78,7 @@ export default function Page() {
               Lecture Slides
             </button>
           </div>
-          <div
-            className="flex flex-grow"
-          >
+          <div className="flex flex-grow">
             <button
               className={`py-2 px-4 rounded-md shadow-lg m-4 text-center flex-grow ${
                 activeButton === "attendance"
@@ -68,9 +90,7 @@ export default function Page() {
               Attendance
             </button>
           </div>
-          <div
-            className="flex flex-grow"
-          >
+          <div className="flex flex-grow">
             <button
               className={`py-2 px-4 rounded-md shadow-lg m-4 text-center flex-grow ${
                 activeButton === "assignment"
@@ -82,9 +102,7 @@ export default function Page() {
               Assignment
             </button>
           </div>
-          <div
-            className="flex flex-grow"
-          >
+          <div className="flex flex-grow">
             <button
               className={`py-2 px-4 rounded-md shadow-lg m-4 text-center flex-grow ${
                 activeButton === "quiz" ? "bg-black text-white" : "bg-slate-200"
@@ -94,9 +112,7 @@ export default function Page() {
               Quiz
             </button>
           </div>
-          <div
-            className="flex flex-grow"
-          >
+          <div className="flex flex-grow">
             <button
               className={`py-2 px-4 rounded-md shadow-lg m-4 text-center flex-grow ${
                 activeButton === "announcement"
