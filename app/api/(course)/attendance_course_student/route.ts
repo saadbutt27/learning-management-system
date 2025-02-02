@@ -5,7 +5,7 @@ export async function POST(request: NextRequest) {
   try {
     const { c_id } = await request.json();
 
-    if (c_id) {
+    if (!c_id) {
       return NextResponse.json(
         { error: "Course ID is required" },
         { status: 400 }

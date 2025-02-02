@@ -4,7 +4,7 @@ import Navigation from "@/components/layout/Navbar";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Teacher - LMS",
+  title: "Attendance - LMS",
   description: "Teacher Dashboard for Learning Management System",
 };
 
