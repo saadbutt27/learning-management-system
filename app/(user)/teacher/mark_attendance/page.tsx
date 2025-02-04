@@ -182,6 +182,15 @@ function MarkAttendance() {
   if (initial) {
     return (
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg md:ml-[90px] mx-6 my-4">
+        <div className="flex justify-between items-center p-2">
+          <h2 className="text-3xl font-semibold p-4">Mark Attendance</h2>
+          <button
+            onClick={() => router.back()}
+            className="text-white bg-black hover:bg-gray-800 focus:ring-gray-300 focus:ring-4 focus:outline-none font-medium rounded-lg text-sm px-4 py-2"
+          >
+            Go Back
+          </button>
+        </div>
         <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
           <thead className="text-base text-gray-700 uppercase bg-gray-50 border-b-2 border-b-gray-700">
             <tr>
