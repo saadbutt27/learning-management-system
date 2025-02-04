@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { query } from "@/lib/db";
 import { getSession } from "next-auth/react";
+import { comparePassword, hashPassword } from '@/lib/passwordEncryption';
 
 export async function GET(req: NextRequest) {
   try {
@@ -72,14 +73,24 @@ export async function PATCH(req: NextRequest) {
   const { t_id, oldPassword, newPassword } = await req.json();
 
   const res = await query({
-    query: "SELECT DISTINCT * FROM teacher WHERE t_id = $1 AND password = $2",
-    values: [t_id!, oldPassword!],
+    query: "SELECT DISTINCT * FROM teacher WHERE t_id = $1",
+    values: [t_id],
   });
+
+  const isCorrectPassword: boolean = await comparePassword(oldPassword, res[0].password);
+  if (!isCorrectPassword) {
+    return NextResponse.json(
+      { message: "Wrong Old Password" },
+      { status: 401 }
+    );
+  }
+
+  const newHashedPassword = await hashPassword(newPassword);
 
   if (res[0]) {
     await query({
       query: "UPDATE teacher SET password = $1 WHERE t_id = $2",
-      values: [newPassword!, t_id!],
+      values: [newHashedPassword, t_id],
     });
 
     return NextResponse.json(true);

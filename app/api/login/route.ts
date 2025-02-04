@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { query } from "@/lib/db";
 import { signJwtAccessToken } from "@/lib/jwt";
-import { comparePassword, hashPassword } from '@/lib/passwordEncryption';
+import { comparePassword } from '@/lib/passwordEncryption';
 
 export async function POST(request: NextRequest) {
   const { userId, password } = await request.json();

@@ -169,6 +169,14 @@ export default function ProfilePage() {
           newPassword: newPassword,
         }),
       });
+
+      if (!res.ok) {
+        if (res.status === 401) {
+          setPassUpdated("incorrect");
+        } 
+        return;
+      }
+
       const data = await res.json();
       if (data) {
         setPassUpdated("changed");
@@ -178,7 +186,7 @@ export default function ProfilePage() {
       }
     } catch (err) {
       console.error("Error resetting password:", err);
-      setPassUpdated("error");
+      // setPassUpdated("error");
     }
   };
 
