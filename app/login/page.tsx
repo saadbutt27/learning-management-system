@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { signIn } from "next-auth/react";
 import { Eye, EyeOff } from "lucide-react";
+// import { passwordHasher } from '@/lib/passwordEncryption';
 
 export default function SignIn() {
   const id = useRef<HTMLInputElement>(null);
@@ -44,10 +45,23 @@ export default function SignIn() {
     setDisable(true);
     setError(null); // Reset error message
 
+    const idValue = id.current?.value;
+    const passwordValue = password.current?.value;
+    if (!idValue) {
+      setError("Id is required.");
+      setDisable(false);
+      return;
+    }
+    if (!passwordValue) {
+      setError("Password is required.");
+      setDisable(false);
+      return;
+    }
+
     try {
       const result = await signIn("credentials", {
-        userId: id.current?.value,
-        password: password.current?.value,
+        userId: idValue,
+        password: passwordValue,
         redirect: false,
         callbackUrl: "/student",
       });

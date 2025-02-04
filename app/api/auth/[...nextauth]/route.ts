@@ -35,7 +35,7 @@ const handler = NextAuth({
 
         const user = await res.json();
 
-        if (user.message == "Invalid credentials") {
+        if (user.message == "Invalid credentials" || user.message == "Wrong Password") {
           // Any object returned will be saved in `user` property of the JWT
           return null;
         } else {
