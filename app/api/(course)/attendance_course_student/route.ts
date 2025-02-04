@@ -1,9 +1,10 @@
 import { query } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(request: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const { c_id } = await request.json();
+    const { searchParams } = new URL(request.url);
+    const c_id = searchParams.get("c_id");
 
     if (!c_id) {
       return NextResponse.json(

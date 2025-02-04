@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
 
     const result = await query({
       query:
-        "SELECT a_id, date_of_attendance FROM attendance WHERE c_id = $1 ORDER BY date_of_attendance DESC",
+        "SELECT a_id, date_of_attendance, is_marked FROM attendance WHERE c_id = $1 ORDER BY date_of_attendance DESC",
       values: [c_id],
     });
 
@@ -42,6 +42,36 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({ a_id: res[0].a_id });
+  } catch (error) {
+    console.error("Error in POST request:", error);
+    return NextResponse.json(
+      { error: "Failed to create session" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PATCH(request: NextRequest) {
+  try {
+    const { a_id, c_id } = await request.json();
+    if (!a_id) {
+      return NextResponse.json(
+        { error: "Attendance ID is required" },
+        { status: 400 }
+      );
+    }
+    if (!c_id) {
+      return NextResponse.json(
+        { error: "Course ID is required" },
+        { status: 400 }
+      );
+    }
+    await query({
+      query: `UPDATE attendance SET is_marked = true where a_id = $1 AND c_id = $2;`,
+      values: [a_id, c_id],
+    });
+
+    return NextResponse.json({ code: 1 });
   } catch (error) {
     console.error("Error in POST request:", error);
     return NextResponse.json(

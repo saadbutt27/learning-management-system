@@ -73,7 +73,7 @@ export default function TeacherPpage() {
   }, [status, session?.user.t_id, courses.length]); // Add session and status as dependencies
 
   // Loading and authenticated state
-  if (status !== "authenticated" || !session) {
+  if (status === "loading" || !session) {
     return (
       <div className="flex justify-center items-center h-screen">
         <div role="status">

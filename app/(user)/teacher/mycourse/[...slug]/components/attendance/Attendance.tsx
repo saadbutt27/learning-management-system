@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-
 import { useSession } from "next-auth/react";
-
 import { formatDateTime } from "@/lib/dateFormatter";
+import clsx from "clsx";
+import Link from "next/link";
 
 interface SessionI {
   a_id: string;
@@ -41,7 +41,11 @@ export default function Attendance() {
         .then((data) => {
           // Add is_marked as true for all fetched sessions
           const updatedSessions = data.sessions.map(
-            (session: { a_id: string; date_of_attendance: string }) => {
+            (session: {
+              a_id: string;
+              date_of_attendance: string;
+              is_marked: boolean;
+            }) => {
               // Call formatDateTime function to get the formatted date and time
               const formattedDateTime = formatDateTime(
                 session.date_of_attendance
@@ -58,7 +62,7 @@ export default function Attendance() {
                 ...session,
                 date: date, // Assign formatted date (e.g., "Feb 02 2025")
                 time: time, // Assign formatted time (e.g., "5:00:00 PM")
-                is_marked: true, // Set is_marked to true
+                is_marked: session.is_marked, // Set is_marked to true
               };
             }
           );
@@ -128,20 +132,32 @@ export default function Attendance() {
                       <td className="px-6 py-4 border-b text-gray-700">
                         {session.time}
                       </td>
-                      <td className="px-6 py-4 border-b text-gray-700">
+                      <td
+                        className={clsx(
+                          "px-6 py-4 border-b",
+                          session.is_marked ? "text-green-600" : "text-red-600"
+                        )}
+                      >
                         {session.is_marked ? "Marked" : "Not Marked"}
                       </td>
                       <td className="px-6 py-4 border-b">
+                        <Link href={`/teacher/mark_attendance?a_id=${session.a_id}&c_id=${course_id}`}>
                         <button
-                          onClick={() =>
-                            router.push(
-                              `/teacher/mark_attendance?a_id=${session.a_id}&c_id=${course_id}`
-                            )
-                          }
-                          className="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2"
+                          // onClick={() =>
+                          //   router.push(
+                          //     `/teacher/mark_attendance?a_id=${session.a_id}&c_id=${course_id}`
+                          //   )
+                          // }
+                          className={clsx(
+                            "text-white  focus:ring-4 focus:outline-none font-medium rounded-lg text-sm px-4 py-2",
+                            session.is_marked
+                              ? "bg-green-500 hover:bg-green-600 focus:ring-green-300"
+                              : "bg-blue-600 hover:bg-blue-700 focus:ring-blue-300"
+                          )}
                         >
-                          View
+                          {session.is_marked ? "View" : "Mark"}
                         </button>
+                        </Link>
                       </td>
                     </tr>
                   ))}
