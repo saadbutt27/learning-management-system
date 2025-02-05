@@ -5,6 +5,9 @@ import { useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import Lecture from "./components/lecture/Lecture";
 import Attendance from "./components/attendance/Attendance";
+import Assignment from "./components/assignment/Assignment";
+import Quiz from "./components/quiz/Quiz";
+import Announcement from "./components/announcement/Announcement";
 
 export default function Page() {
   const pathName = usePathname();
@@ -36,19 +39,19 @@ export default function Page() {
     } else if (activeButton === "assignment") {
       return (
         <div className="border-2 h-full mt-4 duration-500 p-4">
-          {/* <Assignment /> */}
+          <Assignment />
         </div>
       );
     } else if (activeButton === "quiz") {
       return (
         <div className="border-2 h-full mt-4 duration-500 p-4">
-          {/* <Quiz /> */}
+          <Quiz />
         </div>
       );
     } else if (activeButton === "announcement") {
       return (
         <div className="border-2 h-full mt-4 duration-500 p-4">
-          {/* <Announcement /> */}
+          <Announcement />
         </div>
       );
     }
