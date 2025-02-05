@@ -283,7 +283,7 @@ export default function AssignmentComponent({ assignment, onDelete }: Props) {
                               className="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg lg:text-sm text-xs inline-flex items-center lg:px-5 lg:py-2.5 px-3 py-1.5 text-center mr-2"
                               onClick={handleDelete}
                             >
-                              Yes, I'm sure
+                              Yes, I&apos;m sure
                             </button>
                             <button
                               data-modal-hide="popup-modal"
