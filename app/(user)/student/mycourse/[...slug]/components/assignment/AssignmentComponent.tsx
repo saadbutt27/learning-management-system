@@ -7,7 +7,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { formatDateTime } from "@/lib/dateFormatter";
-import clsx from "clsx";
 
 type Props = {
   assignment: {
@@ -24,10 +23,6 @@ type Props = {
 
 export default function AssignmentComponent({ assignment }: Props) {
   const [click, clickResult] = useState(false);
-  // const { toast } = useToast();
-  //   let uploadDate: Date = new Date(2023, 5, 18); // May 18, 2023
-  //   let dueDate: Date = new Date(2023, 5, 25); // May 18, 2023
-  formatDateTime(assignment.due_date);
   const currentDate = new Date();
   const dueDate = new Date(assignment.due_date);
   const isPastDue = currentDate > dueDate;

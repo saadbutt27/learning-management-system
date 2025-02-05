@@ -54,10 +54,10 @@ export default function Assignment() {
         .then((res) => res.json())
         .then((data) => {
           setAssignments(data);
-          console.log(data);
         });
     }
-  }, [status]);
+  }, [status, course_id, teacher_id, student_id, session?.user.accessToken]);
+  
   if (status === "authenticated" && assignments && assignments.length > 0) {
     return (
       <TooltipProvider delayDuration={100}>

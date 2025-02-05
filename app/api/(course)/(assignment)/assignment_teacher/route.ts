@@ -45,3 +45,68 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+
+export async function PATCH(request: NextRequest) {
+  try {
+    const { a_id, due_date } = await request.json();
+    if (!a_id) {
+      return NextResponse.json(
+        { error: "Attendance ID is required" },
+        { status: 400 }
+      );
+    }
+    if (!due_date) {
+      return NextResponse.json(
+        { error: "Due date is required" },
+        { status: 400 }
+      );
+    }
+    const res = await query({
+      query: `UPDATE assignment SET at_due_date = $1 where at_id = $2 RETURNING at_due_date;`,
+      values: [due_date, a_id],
+    });
+
+    // The updated due_date will be in res.rows[0].at_due_date (if using pg for PostgreSQL)
+    if (res.length > 0) {
+      return NextResponse.json({ updated_due_date: res[0].at_due_date });
+    } else {
+      return NextResponse.json(
+        { error: "Assignment not found or no changes made" },
+        { status: 404 }
+      );
+    }
+  } catch (error) {
+    console.error("Error in PATCH request:", error);
+    return NextResponse.json(
+      { error: "Failed to update assignment" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const at_id = searchParams.get("at_id");
+
+    if (!at_id) {
+      return NextResponse.json(
+        { error: "Assignment ID is required" },
+        { status: 400 }
+      );
+    }
+
+    await query({
+      query: `DELETE FROM assignment WHERE at_id = $1;`,
+      values: [at_id],
+    });
+
+    return NextResponse.json({ code: 1 });
+  } catch (error) {
+    console.error("Error in DELETE request:", error);
+    return NextResponse.json(
+      { error: "Failed to delete assignment" },
+      { status: 500 }
+    );
+  }
+}

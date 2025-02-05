@@ -8,9 +8,9 @@ import { Session } from "next-auth";
 
 interface ExtendedSession extends Session {
   user: {
-    s_id: string;
-    s_name: string;
-    s_image?: string;
+    t_id: string;
+    t_name: string;
+    t_image?: string;
     accessToken: string;
   } & Session["user"];
 }
@@ -22,7 +22,7 @@ type Assignment = {
   due_date: string;
   teacher_name: string;
   upload_date: string;
-  at_topic: string;
+  topic: string;
   file: string;
 };
 export default function Assignment() {
@@ -53,7 +53,15 @@ export default function Assignment() {
           setAssignments(data);
         });
     }
-  }, [status, course_id, teacher_id]);
+  }, [status, course_id, teacher_id, session?.user.accessToken]);
+
+  const handleDeleteAssignment = (assignmentId: number) => {
+    setAssignments((prevAssignments) =>
+      prevAssignments?.filter(
+        (assignment) => assignment.assignment_id !== assignmentId
+      )
+    );
+  };
 
   if (status === "authenticated" && assignments && assignments.length > 0) {
     return (
@@ -64,7 +72,11 @@ export default function Assignment() {
             {assignments.length > 0
               ? assignments.map((assignment: Assignment, index: number) => {
                   return (
-                    <AssignmentComponent assignment={assignment} key={index} />
+                    <AssignmentComponent
+                      assignment={assignment}
+                      key={index}
+                      onDelete={handleDeleteAssignment}
+                    />
                   );
                 })
               : "NO ASSIGNMENTS"}
