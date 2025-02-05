@@ -43,7 +43,7 @@ export default function Assignment() {
   useEffect(() => {
     if (status === "authenticated") {
       fetch(
-        `${process.env.NEXT_PUBLIC_URL}/api/assignment?course_id=${course_id}&teacher_id=${teacher_id}&student_id=${student_id}`,
+        `${process.env.NEXT_PUBLIC_URL}/api/assignment_student?course_id=${course_id}&teacher_id=${teacher_id}&student_id=${student_id}`,
         {
           method: "GET",
           headers: {
