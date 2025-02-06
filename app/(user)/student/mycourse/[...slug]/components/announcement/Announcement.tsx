@@ -56,8 +56,8 @@ export default function Announcement() {
           <h2 className="text-3xl font-medium select-none">Announcements</h2>
           <Megaphone className="w-8 h-8" />
         </div>
-        {announcements.map((announcement) => {
-          return <AnnnouncementComponent announcement={announcement} />;
+        {announcements.map((announcement: AnnouncementType, index:number) => {
+          return <AnnnouncementComponent key={index} announcement={announcement} />;
         })}
       </>
     );
