@@ -13,13 +13,6 @@ type Props = {
   onDelete: (assignmentId: number) => void; // Add this
 };
 
-interface FormValues {
-  // Define the fields of your form and their respective types
-  topic: string;
-  description: string;
-  // ...
-}
-
 export default function AnnouncementComponent({
   announcement: initialAnnouncement,
   onDelete,
@@ -29,7 +22,6 @@ export default function AnnouncementComponent({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdateOpen, setIsUpdateOpen] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
-  let formValues: FormValues;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
