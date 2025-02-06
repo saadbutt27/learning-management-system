@@ -2,7 +2,7 @@
 import Link from "next/link";
 import React, { useState, useRef } from "react";
 import { formatDateTime } from "@/lib/dateFormatter";
-import { X, Trash2 } from "lucide-react";
+import { X, Trash2, CircleAlert } from "lucide-react";
 import MyTooltip from "@/components/reusable/MyTooltip";
 
 type Props = {
@@ -229,7 +229,7 @@ export default function AssignmentComponent({ assignment, onDelete }: Props) {
                   </button>
                 </form>
               </div>
-              <div className="">
+              <div>
                 {isModalOpen && (
                   <div
                     id="popup-modal"
@@ -237,41 +237,29 @@ export default function AssignmentComponent({ assignment, onDelete }: Props) {
                   >
                     <div className="relative w-full max-w-md max-h-full">
                       <div className="relative bg-white border-2 border-gray-300 rounded-lg shadow dark:bg-gray-700">
-                        <div className="p-6 text-center">
-                          <svg
-                            aria-hidden="true"
-                            className="mx-auto lg:mb-4 mb-2 text-gray-400 lg:w-14 lg:h-14 w-8 h-8 dark:text-gray-200"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                            ></path>
-                          </svg>
+                        <div className="flex flex-col  items-center p-6 text-center gap-y-5">
+                          <CircleAlert className="w-10 h-10" />
                           <h3 className="lg:mb-5 mb-2 lg:text-lg text-sm font-normal text-gray-500 dark:text-gray-400">
                             Are you sure you want to delete this assignment?
                           </h3>
-                          <button
-                            data-modal-hide="popup-modal"
-                            type="button"
-                            className="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg lg:text-sm text-xs inline-flex items-center lg:px-5 lg:py-2.5 px-3 py-1.5 text-center mr-2"
-                            onClick={handleDelete}
-                          >
-                            Yes, I&apos;m sure
-                          </button>
-                          <button
-                            data-modal-hide="popup-modal"
-                            type="button"
-                            className="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 lg:text-sm text-xs font-medium lg:px-5 lg:py-2.5 px-3 py-1.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
-                            onClick={closeModal}
-                          >
-                            No, cancel
-                          </button>
+                          <div>
+                            <button
+                              data-modal-hide="popup-modal"
+                              type="button"
+                              className="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg lg:text-sm text-xs inline-flex items-center lg:px-5 lg:py-2.5 px-3 py-1.5 text-center mr-2"
+                              onClick={handleDelete}
+                            >
+                              Yes, I&apos;m sure
+                            </button>
+                            <button
+                              data-modal-hide="popup-modal"
+                              type="button"
+                              className="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 lg:text-sm text-xs font-medium lg:px-5 lg:py-2.5 px-3 py-1.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
+                              onClick={closeModal}
+                            >
+                              No, cancel
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>

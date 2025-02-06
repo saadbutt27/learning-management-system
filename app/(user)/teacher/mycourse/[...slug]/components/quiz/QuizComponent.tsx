@@ -178,7 +178,7 @@ export default function QuizComponent({ quiz, onDelete }: Props) {
               </div>
             </div>
 
-            <div className="">
+            <div>
               {isModalOpen && (
                 <div
                   id="popup-modal"
@@ -189,7 +189,7 @@ export default function QuizComponent({ quiz, onDelete }: Props) {
                       <div className="flex flex-col  items-center p-6 text-center gap-y-5">
                         <CircleAlert className="w-10 h-10" />
                         <h3 className="lg:mb-5 mb-2 lg:text-lg text-sm font-normal text-gray-500 dark:text-gray-400">
-                          Are you sure you want to delete this assignment?
+                          Are you sure you want to delete this quiz?
                         </h3>
                         <div>
                           <button
