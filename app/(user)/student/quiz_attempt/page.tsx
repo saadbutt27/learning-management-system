@@ -2,7 +2,7 @@
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { Session } from "next-auth";
 import { CircleAlert } from "lucide-react";
 
@@ -25,7 +25,15 @@ type QuestionType = {
   q_id: string;
 };
 
-export default function QuizAttempt() {
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <QuizAttempt />
+    </Suspense>
+  );
+}
+
+function QuizAttempt() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [quizDone, setQuizDone] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -73,27 +81,8 @@ export default function QuizAttempt() {
     }
   }, [status, course_id, student_id, q_id, session?.user.accessToken]);
 
-  // Timer for Quiz
-  let duration = 1 * 60;
-  const [time, setTime] = useState(duration);
-
-  useEffect(() => {
-    if (time > 0) {
-      const timer = setInterval(() => {
-        setTime((prevTime) => {
-          if (prevTime === 11) setShowWarning(true);
-          return prevTime - 1;
-        });
-      }, 1000);
-      return () => clearInterval(timer);
-    } else {
-      // clearInterval(timer); // Ensure timer is cleared before submission
-      handleSubmitQuiz(); // Automatically submit the quiz
-    }
-  }, [time]);
-
   const handleNextQuestion = () => {
-    let radios = document.getElementsByName("option");
+    const radios = document.getElementsByName("option");
     radios.forEach((opt) => {
       (opt as HTMLInputElement).checked = false;
     });
@@ -101,7 +90,7 @@ export default function QuizAttempt() {
   };
 
   const handlePrevQuestion = () => {
-    let radios = document.getElementsByName("option");
+    const radios = document.getElementsByName("option");
     radios.forEach((opt) => {
       (opt as HTMLInputElement).checked = false;
     });
@@ -114,17 +103,6 @@ export default function QuizAttempt() {
     setTimeUp(false);
   };
 
-  // Time formatter in minutes:seconds
-  const formatTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-
-    return `${minutes.toString().padStart(2, "0")}:${remainingSeconds
-      .toString()
-      .padStart(2, "0")}`;
-  };
-  let showTime: string = formatTime(time);
-
   // Modal Handlers when user submits the quiz
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -135,7 +113,7 @@ export default function QuizAttempt() {
 
   const calculateResult = () => {
     let score = 0;
-    answers.length > 0 &&
+    if (answers.length > 0) {
       questions?.forEach((question, index) => {
         if (
           answers[index].toLowerCase() ===
@@ -144,6 +122,7 @@ export default function QuizAttempt() {
           score++;
         }
       });
+    }
     return score;
   };
 
@@ -193,6 +172,35 @@ export default function QuizAttempt() {
     }
   };
 
+  // Timer for Quiz
+  const duration = 1 * 60;
+  const [time, setTime] = useState(duration);
+
+  useEffect(() => {
+    if (time > 0) {
+      const timer = setInterval(() => {
+        setTime((prevTime) => {
+          if (prevTime === 11) setShowWarning(true);
+          return prevTime - 1;
+        });
+      }, 1000);
+      return () => clearInterval(timer);
+    } else {
+      // clearInterval(timer); // Ensure timer is cleared before submission
+      handleSubmitQuiz(); // Automatically submit the quiz
+    }
+  }, [time]);
+
+  // Time formatter in minutes:seconds
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+
+    return `${minutes.toString().padStart(2, "0")}:${remainingSeconds
+      .toString()
+      .padStart(2, "0")}`;
+  };
+
   if (status === "authenticated" && questions && questions.length > 0) {
     return (
       <>
@@ -218,7 +226,7 @@ export default function QuizAttempt() {
                 time <= 10 ? "text-red-600" : "text-black"
               }`}
             >
-              Time Left: {showTime}
+              Time Left: {formatTime(time)}
             </div>
           </div>
           <div

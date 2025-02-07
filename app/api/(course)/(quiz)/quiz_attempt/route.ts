@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const res = await query({
+    await query({
       query: `INSERT INTO quiz_attempt VALUES ($1, $2, $3, $4, $5, NOW());`,
       values: [s_id, q_id, attempt, marks_obtained, total_marks],
     });

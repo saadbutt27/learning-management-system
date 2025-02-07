@@ -2,19 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { query } from "@/lib/db";
 import jwt from "jsonwebtoken";
 
-type Props = {
-  params: {
-    teacher_id: string;
-    course_id: string;
-    student_id: string;
-  };
-};
-
 export async function GET(req: NextRequest) {
   try {
-    // const { t_id, c_id } = params;
     const accessToken = req.headers.get("authorization")?.split(" ")[1];
-    // console.log("tok: ", accessToken)
     const { searchParams } = new URL(req.url);
     const q_id = searchParams.get("q_id");
     const c_id = searchParams.get("course_id");
