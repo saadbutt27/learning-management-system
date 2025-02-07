@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import React from "react";
 import { compareDate } from "@/lib/dateFormatter";
 import MyTooltip from "@/components/reusable/MyTooltip";
+import { MoveRight } from "lucide-react";
 
 type Props = {
   quiz: {
@@ -59,26 +60,13 @@ export default function QuizComponent({ quiz }: Props) {
                 <>
                   <Link
                     href={{
-                      pathname: "/my/attempt",
+                      pathname: "/student/quiz_attempt/",
                       query: { course_id, q_id: quiz.q_id, student_id },
                     }}
-                    className="hover:underline hover:text-gray-600 font-medium flex items-center"
+                    className="group hover:underline hover:text-gray-600 font-medium flex items-center duration-300"
                   >
                     Go to Quiz
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      className="w-5 h-5 ml-2 transition-transform transform-gpu hover:translate-x-1 hover:duration-200"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
-                      />
-                    </svg>
+                    <MoveRight className="w-5 h-5 ml-1.5 transition-transform transform-gpu group-hover:translate-x-1 group-hover:duration-200" />
                   </Link>
                   <p className="">{`Duration: ${quiz.q_time} mins`}</p>
                 </>
