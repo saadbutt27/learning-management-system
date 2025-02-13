@@ -28,7 +28,8 @@ const Navigation = () => {
   // console.log("Session: ", session);
 
   const src =
-    session?.user.s_image || session?.user.t_image ||
+    session?.user.s_image ||
+    session?.user.t_image ||
     "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
 
   return (
@@ -195,6 +196,33 @@ const Navigation = () => {
 
               {open && screen.width > 768 ? "Attendance" : ""}
             </li>
+
+            {session?.user.t_id && (
+              <Link href="/teacher/upload">
+                <li
+                  className={
+                    (open ? `px-6` : `justify-center px-2 ml-2`) +
+                    ` flex items-center py-4 bg-white`
+                  }
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-6 h-6 md:mr-4"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"
+                    />
+                  </svg>
+                  {open && screen.width > 768 ? "Upload Any Material" : ""}
+                </li>
+              </Link>
+            )}
           </ul>
         </div>
       </div>
@@ -262,13 +290,15 @@ const Navigation = () => {
                 <p>Dashboard</p>
               </li>
             </Link>
-            <Link href={{
+            <Link
+              href={{
                 pathname: session?.user.s_id
                   ? "/student/profile"
                   : session?.user.t_id
                   ? "/teacher/profile"
                   : "#",
-              }}>
+              }}
+            >
               <li className="flex items-center py-2 px-4 hover:bg-gray-100">
                 {/* <svg
                   xmlns="http://www.w3.org/2000/svg"
