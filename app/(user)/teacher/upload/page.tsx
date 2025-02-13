@@ -3,12 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
-import { getTeacherCourses } from "@/lib/fetchData";
 import Lecture from "./components/Lecture";
-// import Attendance from "./components/Attendance";
-// import Assignment from "./components/Assignment";
-// import Quiz from "./components/Quiz";
-// import Announcement from "./components/Announcement";
+import Assignment from "./components/Assignment";
 import { Session } from "next-auth";
 
 interface ExtendedSession extends Session {
@@ -84,10 +80,8 @@ export default function UploadPage() {
     switch (activeButton) {
       case "lecture":
         return <Lecture courses={courses} status={status} />;
-      case "attendance":
-      // return <Attendance />;
       case "assignment":
-      // return <Assignment />;
+        return <Assignment courses={courses} status={status} />;
       case "quiz":
       // return <Quiz />;
       case "announcement":
@@ -107,7 +101,6 @@ export default function UploadPage() {
         <div className="border-2 border-t-2 border-t-black p-2 flex flex-wrap">
           {[
             { name: "lecture", label: "Lecture Slides" },
-            { name: "attendance", label: "Attendance" },
             { name: "assignment", label: "Assignment" },
             { name: "quiz", label: "Quiz" },
             { name: "announcement", label: "Announcements" },
