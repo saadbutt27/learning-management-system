@@ -26,13 +26,13 @@ export default function Material({
               <Link
                 href={file}
                 target={"_blank"}
-                className="hover:underline hover:text-gray-600 font-medium"
+                className="hover:text-gray-600 font-semibold underline"
               >
                 Download Lecture
               </Link>
             )}
             <p>
-              <span className="font-medium">Upload Date:</span>{" "}
+              <span className="font-semibold">Upload Date:</span>{" "}
               {formatDateTime(uploadDate)}{" "}
             </p>
           </div>
