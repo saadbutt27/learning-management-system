@@ -21,14 +21,19 @@ export async function GET(req: NextRequest) {
         { status: 400 }
       );
     }
-    
+
     const decodedToken = jwt.decode(accessToken!) as jwt.JwtPayload;
     if (decodedToken?.s_id != s_id) {
       return NextResponse.json("Your are not eligible to access this page");
     }
 
     const res = await query({
-      query: `SELECT m_topic as topic, m_desc as description, m_upload_date as upload_date, m_file FROM course_material WHERE c_id = $1;`,
+      query: `SELECT 
+                m.m_topic as topic, m.m_desc as description, m.m_upload_date as upload_date, m.m_file 
+              FROM course_material m
+              JOIN material_course mc ON m.m_id = mc.m_id
+              WHERE c_id = $1
+              ORDER BY m.m_upload_date DESC;`,
       values: [c_id!],
     });
 

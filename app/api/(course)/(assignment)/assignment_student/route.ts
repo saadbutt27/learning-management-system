@@ -38,12 +38,13 @@ export async function GET(req: NextRequest) {
     }
 
     const res = await query({
-      query: `SELECT a.at_file as file, a.at_id as assignment_id, a.at_topic as topic, a.at_desc as assignment_description, a.at_upload_date as upload_date, a.at_due_date as due_date, t.t_name as teacher_name, c.c_title as course_name 
-              FROM course c JOIN teacher t ON t.t_id = c.t_id
-              JOIN assignment a ON c.c_id = a.c_id 
-              WHERE t.t_id = $1 AND c.c_id = $2 
+      query: `SELECT 
+                ac.c_id as course_id, a.at_topic as topic, a.at_id as assignment_id, a.at_desc as assignment_description, a.at_upload_date as upload_date, a.at_due_date as due_date, a.at_file as file
+              FROM assignment a 
+              JOIN assignment_course ac ON a.at_id = ac.at_id
+              WHERE ac.c_id = $1
               ORDER BY a.at_due_date DESC;`,
-      values: [t_id, c_id],
+      values: [c_id],
     });
 
     return NextResponse.json(res);

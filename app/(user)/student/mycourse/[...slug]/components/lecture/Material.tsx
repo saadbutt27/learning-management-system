@@ -26,7 +26,7 @@ export default function Material({
               <Link
                 href={file}
                 target={"_blank"}
-                className="hover:underline hover:text-gray-600 font-medium"
+                className="hover:text-gray-600 font-semibold underline"
               >
                 Download Lecture
               </Link>

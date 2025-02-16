@@ -31,7 +31,12 @@ export async function GET(req: NextRequest) {
     }
 
     const res = await query({
-      query: `SELECT q_id,q_topic, q_desc, q_upload_date, q_due_date, q_time FROM quiz WHERE c_id = $1;`,
+      query: `SELECT 
+                q.q_id, q.q_topic, q.q_desc, q.q_upload_date, q.q_due_date, q.q_time 
+                FROM quiz q
+                JOIN quiz_course qc ON qc.q_id = q.q_id
+                WHERE qc.c_id = $1
+                ORDER BY q.q_upload_date DESC;`,
       values: [c_id],
     });
 

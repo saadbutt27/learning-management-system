@@ -13,29 +13,45 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Construct the SQL query dynamically
-    let insert_query =
-      "INSERT INTO course_material (m_topic, m_desc, m_upload_date, c_id, m_file) VALUES";
-    let values: any[] = [];
-
-    for (let i = 0; i < selectedCourses.length; i++) {
-      if (i > 0) insert_query += ","; // Add a comma between values for multiple inserts
-      insert_query += ` ($${i * 4 + 1}, $${i * 4 + 2}, CURRENT_TIMESTAMP, $${
-        i * 4 + 3
-      }, $${i * 4 + 4})`;
-
-      values.push(topic, desc, selectedCourses[i], fileLink);
-    }
-
-    insert_query += ";"; // End the query
-
-    // Execute the query
-    const res = await query({
-      query: insert_query,
-      values,
+    await query({
+      query: "BEGIN;",
+      values: [],
     });
 
-    return NextResponse.json({ success: true, result: res });
+    // Construct the SQL query dynamically
+    let lectureInsertQuery = `INSERT INTO course_material (m_topic, m_desc, m_upload_date, m_file)
+       VALUES ($1, $2, CURRENT_TIMESTAMP, $3) RETURNING at_id;
+      `;
+    let lectureValues = [topic, desc, fileLink || null];
+    const lectureResult = await query({
+      query: lectureInsertQuery,
+      values: lectureValues,
+    });
+
+    if (!lectureResult || lectureResult.length === 0) {
+      throw new Error("Failed to insert assignment");
+    }
+
+    const lectureId = lectureResult[0].m_id;
+
+    // Insert course relations into the lecture_course table
+    const courseInsertQuery =
+      `
+      INSERT INTO lecture_course (m_id, c_id) VALUES ` +
+      selectedCourses
+        .map((_: any, index: number) => `($1, $${index + 2})`)
+        .join(", ") +
+      `;`;
+
+    const courseValues = [lectureId, ...selectedCourses];
+    await query({ query: courseInsertQuery, values: courseValues });
+
+    await query({
+      query: "COMMIT;",
+      values: [],
+    });
+
+    return NextResponse.json({ success: true, lectureId });
   } catch (error) {
     console.error("Error in POST request:", error);
     return NextResponse.json(

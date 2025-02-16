@@ -43,7 +43,7 @@ export default function AssignmentComponent({ assignment }: Props) {
                   <Link
                     href={assignment.file}
                     target="_blank"
-                    className="hover:underline hover:text-gray-600 "
+                    className="hover:text-gray-600 font-semibold underline"
                   >
                     Download Assignment
                   </Link>

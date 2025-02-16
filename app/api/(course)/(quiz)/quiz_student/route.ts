@@ -31,10 +31,22 @@ export async function GET(req: NextRequest) {
     }
 
     const res = await query({
-      query: `SELECT q.q_id, q_topic, q_desc, q_upload_date, q_due_date, q_time, qa.attempt, qa.marks_obtained, qa.total_marks
-              FROM quiz q
-              LEFT JOIN quiz_attempt qa ON qa.q_id = q.q_id AND qa.s_id = $1
-              WHERE q.c_id =$2;`,
+      query: `SELECT 
+                q.q_id, 
+                q.q_topic, 
+                q.q_desc, 
+                q.q_upload_date, 
+                q.q_due_date, 
+                q.q_time, 
+                qa.attempt, 
+                qa.marks_obtained, 
+                qa.total_marks
+            FROM quiz q
+            JOIN quiz_course qc ON q.q_id = qc.q_id
+            LEFT JOIN quiz_attempt qa ON qa.q_id = q.q_id AND qa.s_id = $1
+            WHERE qc.c_id = $2
+            ORDER BY q.q_due_date DESC;
+`,
       values: [s_id, c_id],
     });
 

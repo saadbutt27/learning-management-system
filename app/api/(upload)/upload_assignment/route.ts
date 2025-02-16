@@ -15,27 +15,46 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Construct SQL query dynamically for multiple courses
-    let insert_query = `INSERT INTO assignment (at_topic, at_desc, at_upload_date, at_due_date, c_id, at_file) VALUES `;
-    let values: any[] = [];
-    let placeholders: string[] = [];
-
-    selectedCourses.forEach((courseId: string, index: number) => {
-      const baseIndex = index * 5;
-      placeholders.push(
-        `($${baseIndex + 1}, $${baseIndex + 2}, CURRENT_TIMESTAMP, $${
-          baseIndex + 3
-        }, $${baseIndex + 4}, $${baseIndex + 5})`
-      );
-      values.push(topic, desc, dueDate, courseId, fileLink || null);
+    await query({
+      query: "BEGIN;",
+      values: [],
     });
 
-    insert_query += placeholders.join(", ") + ";";
+    // Insert assignment details into the assignment table
+    const assignmentInsertQuery = `
+      INSERT INTO assignment (at_topic, at_desc, at_upload_date, at_due_date, at_file) 
+      VALUES ($1, $2, CURRENT_TIMESTAMP, $3, $4) RETURNING at_id;
+    `;
+    const assignmentValues = [topic, desc, dueDate, fileLink || null];
+    const assignmentResult = await query({
+      query: assignmentInsertQuery,
+      values: assignmentValues,
+    });
 
-    // Execute the query
-    const res = await query({ query: insert_query, values });
+    if (!assignmentResult || assignmentResult.length === 0) {
+      throw new Error("Failed to insert assignment");
+    }
 
-    return NextResponse.json({ success: true, result: res });
+    const assignmentId = assignmentResult[0].at_id;
+
+    // Insert course relations into the assignment_course table
+    const courseInsertQuery =
+      `
+      INSERT INTO assignment_course (at_id, c_id) VALUES ` +
+      selectedCourses
+        .map((_: any, index: number) => `($1, $${index + 2})`)
+        .join(", ") +
+      `;`;
+
+    const courseValues = [assignmentId, ...selectedCourses];
+    await query({ query: courseInsertQuery, values: courseValues });
+
+    await query({
+      query: "COMMIT;",
+      values: [],
+    });
+
+    return NextResponse.json({ success: true, assignmentId });
   } catch (error) {
     console.error("Error in POST request:", error);
     return NextResponse.json(

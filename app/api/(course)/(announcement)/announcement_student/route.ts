@@ -31,7 +31,12 @@ export async function GET(req: NextRequest) {
     }
 
     const res = await query({
-      query: `SELECT an_topic as topic, an_desc as description, an_upload_date as upload_date FROM course_announcement WHERE c_id = $1;`,
+      query: `SELECT 
+                a.an_id, a.an_topic as topic, a,an_desc as description, a.an_upload_date as upload_date 
+              FROM course_announcement a
+              JOIN announcement_course ac ON a.an_id = ac.an_id
+              WHERE ac.c_id = $1
+              ORDER BY a.an_upload_date DESC;`,
       values: [c_id],
     });
 

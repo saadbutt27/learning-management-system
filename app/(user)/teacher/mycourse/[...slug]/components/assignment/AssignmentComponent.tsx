@@ -183,13 +183,13 @@ export default function AssignmentComponent({ assignment, onDelete }: Props) {
                   <Link
                     href={assignment.file}
                     target={"_blank"}
-                    className="hover:underline hover:text-gray-600 "
+                    className="hover:text-gray-600 font-semibold underline"
                   >
                     Download Assignment
                   </Link>
                 )}
                 <p
-                  className="hover:underline hover:text-gray-600 cursor-pointer"
+                  className="hover:text-gray-600 font-semibold underline"
                   onClick={() => clickResult(!click)}
                 >
                   See Submissions
