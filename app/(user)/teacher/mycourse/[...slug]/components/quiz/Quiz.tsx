@@ -49,7 +49,7 @@ export default function Quiz() {
         .then((res) => res.json())
         .then((data) => {
           setQuizzes(data);
-          console.log(data);
+          // console.log(data);
         });
     }
   }, [status, course_id, teacher_id, session?.user.accessToken]);

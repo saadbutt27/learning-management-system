@@ -7,6 +7,7 @@ import Lecture from "./components/Lecture";
 import Assignment from "./components/Assignment";
 import { Session } from "next-auth";
 import Announcement from "./components/Announcement";
+import Quiz from "./components/Quiz";
 
 interface ExtendedSession extends Session {
   user: {
@@ -84,7 +85,7 @@ export default function UploadPage() {
       case "assignment":
         return <Assignment courses={courses} status={status} />;
       case "quiz":
-      // return <Quiz />;
+        return <Quiz courses={courses} status={status} />;
       case "announcement":
         return <Announcement courses={courses} status={status} />;
       default:

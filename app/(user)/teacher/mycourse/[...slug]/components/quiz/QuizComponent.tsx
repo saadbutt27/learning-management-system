@@ -1,9 +1,12 @@
 "use client";
 import MyTooltip from "@/components/reusable/MyTooltip";
+import { Skeleton } from "@/components/ui/skeleton";
+import { formatDateTime } from "@/lib/dateFormatter";
+import { Session } from "inspector/promises";
 import { Trash2, X, CircleAlert } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 type Props = {
   quiz: {
@@ -31,6 +34,7 @@ export default function QuizComponent({ quiz, onDelete }: Props) {
   };
   const [isUpdateOpen, setIsUpdateOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [attemptsOpen, setAttemptsOpen] = useState(false);
 
   const [updatedDate, setUpdatedDate] = useState<string>(quiz.q_due_date);
   const formRef = useRef<HTMLFormElement>(null);
@@ -80,6 +84,13 @@ export default function QuizComponent({ quiz, onDelete }: Props) {
     setIsModalOpen(false);
   };
 
+  const handleOpenAttemptsModal = () => {
+    setAttemptsOpen(true);
+  };
+  const closeAttemptsModal = () => {
+    setAttemptsOpen(false);
+  };
+
   const handleDelete = async () => {
     await fetch(
       `${process.env.NEXT_PUBLIC_URL}/api/quiz_teacher?q_id=${quiz.q_id}`,
@@ -104,7 +115,7 @@ export default function QuizComponent({ quiz, onDelete }: Props) {
   const isPastDue = currentDate > dueDate;
 
   return (
-    <li className="border-t-2 border-black my-2 py-4">
+    <li className="border-t-2 border-black py-4">
       <div className="sm:flex items-center justify-between border-2 bg-slate-100 pt-4 pb-10 px-5 my-1">
         <div className="flex basis-full">
           <div className="select-none w-full">
@@ -121,7 +132,7 @@ export default function QuizComponent({ quiz, onDelete }: Props) {
                         <div className="flex justify-between items-center">
                           <label
                             htmlFor="dueDate"
-                            className="text-left block mb-2 text-base font-medium text-gray-900 dark:text-white"
+                            className="text-left block text-base font-medium text-gray-900 dark:text-white"
                           >
                             Update Due Date
                           </label>
@@ -178,6 +189,7 @@ export default function QuizComponent({ quiz, onDelete }: Props) {
               </div>
             </div>
 
+            {/* Modal for delete confirmation */}
             <div>
               {isModalOpen && (
                 <div
@@ -188,7 +200,7 @@ export default function QuizComponent({ quiz, onDelete }: Props) {
                     <div className="relative bg-white border-2 border-gray-300 rounded-lg shadow dark:bg-gray-700">
                       <div className="flex flex-col  items-center p-6 text-center gap-y-5">
                         <CircleAlert className="w-10 h-10" />
-                        <h3 className="lg:mb-5 mb-2 lg:text-lg text-sm font-normal text-gray-500 dark:text-gray-400">
+                        <h3 className="lg:mb-5 lg:text-lg text-sm font-normal text-gray-500 dark:text-gray-400">
                           Are you sure you want to delete this quiz?
                         </h3>
                         <div>
@@ -216,32 +228,64 @@ export default function QuizComponent({ quiz, onDelete }: Props) {
               )}
             </div>
 
-            <div className="mt-2">
-              {
-                <Link
+            <div className="mt-2 group">
+              <button
+                className="flex items-center hover:text-gray-600 font-semibold underline"
+                onClick={handleOpenAttemptsModal}
+              >
+                {/* <Link
                   href={{
                     pathname: "/teacher/attempts",
                     query: { q_id: quiz.q_id, c_id: course_id },
                   }}
-                  className="hover:underline hover:text-gray-600 font-medium flex items-center"
+                  className="flex items-center hover:text-gray-600 font-semibold underline"
+                > */}
+                See Attempts
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  className="w-4 h-4 ml-1 transition-transform transform-gpu group-hover:translate-x-1 group-hover:duration-200"
                 >
-                  See Attempts
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className="w-5 h-5 ml-2 transition-transform transform-gpu hover:translate-x-1 hover:duration-200"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
-                    />
-                  </svg>
-                </Link>
-              }
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+                  />
+                </svg>
+                {/* </Link> */}
+              </button>
+            </div>
+
+            {/* Modal for attempts */}
+            <div>
+              {attemptsOpen && (
+                <div
+                  id="popup-modal"
+                  className={`flex items-center justify-center fixed top-0 left-[10%] right-[10%] lg:left-0 z-50 p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full`}
+                >
+                  <div className="relative w-full max-w-fit max-h-full">
+                    <div className="relative bg-white border-2 border-gray-300 rounded-lg shadow dark:bg-gray-700 p-6">
+                      <div className="flex items-start justify-between text-center gap-y-5">
+                        <h2 className="sm:text-2xl text-xl font-semibold mb-4">
+                          Quiz Submissions
+                        </h2>
+                        <button
+                          data-modal-hide="popup-modal"
+                          type="button"
+                          className="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 lg:text-sm text-xs font-medium lg:px-5 lg:py-2.5 px-3 py-1.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
+                          onClick={closeAttemptsModal}
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      </div>
+                      <SeeAttempts quiz_id={quiz.q_id} />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -249,3 +293,133 @@ export default function QuizComponent({ quiz, onDelete }: Props) {
     </li>
   );
 }
+
+interface Student {
+  s_id: number;
+  s_name: string;
+  upload_date: string | null;
+  marks_obtained: number | null;
+  total_marks: number;
+}
+
+const SeeAttempts = ({ quiz_id }: { quiz_id: number }) => {
+  const searchParams = useSearchParams();
+  const course_id = searchParams.get("course_id");
+  const teacher_id = searchParams.get("teacher_id");
+
+  const [students, setStudents] = useState<Student[] | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStudents = async () => {
+      if (!quiz_id || !teacher_id || !course_id) return;
+
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_URL}/api/student_quiz_attempts?q_id=${quiz_id}&t_id=${teacher_id}&c_id=${course_id}`
+        );
+        const data = await res.json();
+        setStudents(data);
+      } catch (error) {
+        console.error("Error fetching student data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStudents();
+  }, [quiz_id, teacher_id, course_id]);
+
+  return (
+    <div className="select-none">
+      {loading ? (
+        <SkeletonTable />
+      ) : students && students.length > 0 ? (
+        <StudentTable students={students} />
+      ) : (
+        <p className="flex justify-center items-center text-xl font-bold">
+          There are no attempts!
+        </p>
+      )}
+    </div>
+  );
+};
+
+const StudentTable = ({ students }: { students: Student[] }) => (
+  <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+    <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+      <thead className="text-base text-gray-700 uppercase bg-gray-50 border-b-2 border-b-gray-700">
+        <tr>
+          <th className="px-6 py-3">Student ID</th>
+          <th className="px-6 py-3">Name</th>
+          <th className="px-6 py-3">Submission Date</th>
+          <th className="px-6 py-3">Quiz Marks</th>
+        </tr>
+      </thead>
+      <tbody>
+        {students.map((student) => (
+          <tr
+            key={student.s_id}
+            className={`text-gray-900 text-sm border-b ${
+              student.marks_obtained === null
+                ? "bg-white even:bg-gray-100"
+                : student.marks_obtained === student.total_marks
+                ? "bg-green-500 text-white"
+                : student.marks_obtained === 0
+                ? "bg-red-600 text-white"
+                : ""
+            }`}
+          >
+            <td className="px-6 py-4">{student.s_id}</td>
+            <td className="px-6 py-4 font-medium whitespace-nowrap">
+              {student.s_name}
+            </td>
+            <td className="px-6 py-4 font-medium whitespace-nowrap">
+              {student.upload_date
+                ? formatDateTime(student.upload_date)
+                : "N/A"}
+            </td>
+            <td className="px-6 py-4 font-medium tracking-widest whitespace-nowrap">
+              {student.marks_obtained === null
+                ? "Not Attempted"
+                : `${student.marks_obtained}/${student.total_marks}`}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+);
+
+const SkeletonTable = () => (
+  <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+    <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+      <thead className="text-base text-gray-700 uppercase bg-gray-50 border-b-2 border-b-gray-700">
+        <tr>
+          <th className="px-6 py-3">Student ID</th>
+          <th className="px-6 py-3">Name</th>
+          <th className="px-6 py-3">Submission Date</th>
+          <th className="px-6 py-3">Quiz Marks</th>
+        </tr>
+      </thead>
+      <tbody>
+        {[...Array(5)].map((_, index) => (
+          <tr key={index}>
+            <td className="px-2 py-4">
+              <Skeleton className="w-full h-10 bg-gray-200" />
+            </td>
+            <td className="px-2 py-4">
+              <Skeleton className="w-full h-10 bg-gray-200" />
+            </td>
+            <td className="px-2 py-4">
+              <Skeleton className="w-full h-10 bg-gray-200" />
+            </td>
+            <td className="px-2 py-4">
+              <Skeleton className="w-full h-10 bg-gray-200" />
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+);
