@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import Lecture from "./components/Lecture";
 import Assignment from "./components/Assignment";
 import { Session } from "next-auth";
+import Announcement from "./components/Announcement";
 
 interface ExtendedSession extends Session {
   user: {
@@ -85,7 +86,7 @@ export default function UploadPage() {
       case "quiz":
       // return <Quiz />;
       case "announcement":
-      // return <Announcement />;
+        return <Announcement courses={courses} status={status} />;
       default:
         return (
           <p className="flex justify-center items-center text-base text-gray-600">
