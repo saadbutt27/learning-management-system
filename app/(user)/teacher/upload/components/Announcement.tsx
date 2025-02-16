@@ -108,7 +108,7 @@ const Announcement: React.FC<AnnouncementProps> = ({ courses, status }) => {
       form.reset();
       setPdf([]);
       setSelectedFile(null);
-    } catch (error: any) {
+    } catch (error) {
       console.log(error);
     } finally {
       setUploading(false);

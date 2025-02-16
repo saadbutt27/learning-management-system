@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, ChangeEvent } from "react";
+import React, { useState } from "react";
 import { Plus } from "lucide-react";
 
 // Type Definitions
@@ -12,10 +12,10 @@ interface CourseType {
   section: string;
 }
 
-interface PdfFile {
-  fileUrl: string;
-  fileKey: string;
-}
+// interface PdfFile {
+//   fileUrl: string;
+//   fileKey: string;
+// }
 
 interface QuizProps {
   courses: CourseType[];
@@ -60,17 +60,30 @@ const Quiz: React.FC<QuizProps> = ({ courses, status }) => {
   const handleChange = (index: number, fieldName: string, value: string) => {
     setData((prevForms) => {
       const updatedForms = [...prevForms];
-      fieldName === "question"
-        ? (updatedForms[index].question = value)
-        : fieldName === "optA"
-        ? (updatedForms[index].optA = value)
-        : fieldName === "optB"
-        ? (updatedForms[index].optB = value)
-        : fieldName === "optC"
-        ? (updatedForms[index].optC = value)
-        : fieldName === "optD"
-        ? (updatedForms[index].optD = value)
-        : (updatedForms[index].correctOpt = +value);
+
+      switch (fieldName) {
+        case "question":
+          updatedForms[index].question = value;
+          break;
+        case "optA":
+          updatedForms[index].optA = value;
+          break;
+        case "optB":
+          updatedForms[index].optB = value;
+          break;
+        case "optC":
+          updatedForms[index].optC = value;
+          break;
+        case "optD":
+          updatedForms[index].optD = value;
+          break;
+        case "correctOpt":
+          updatedForms[index].correctOpt = +value;
+          break;
+        default:
+          break;
+      }
+
       return updatedForms;
     });
   };
@@ -171,7 +184,7 @@ const Quiz: React.FC<QuizProps> = ({ courses, status }) => {
 
       // setPdf([]);
       // setSelectedFile(null);
-    } catch (error: any) {
+    } catch (error) {
       console.log(error);
     } finally {
       setUploading(false);
@@ -267,16 +280,19 @@ const Quiz: React.FC<QuizProps> = ({ courses, status }) => {
           id="duration"
           name="duration"
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-500 focus:border-gray-500 block w-full p-2.5"
-          placeholder="Quiz duration here (5 min to 60 min)"
+          placeholder="Quiz duration here (minimum 5 minutes)"
           min={5}
-          max={60}
           required
         />
       </div>
 
       {/* Quiz Question bank */}
       {data.map((val, index) => (
-        <div id="form" className={"transition-opacity duration-300"}>
+        <div
+          key={index}
+          id="form"
+          className={"transition-opacity duration-300"}
+        >
           <span className="text-lg font-medium">Question no. {index + 1}</span>
           <div className="my-6">
             <label

@@ -2,9 +2,7 @@
 import MyTooltip from "@/components/reusable/MyTooltip";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDateTime } from "@/lib/dateFormatter";
-import { Session } from "inspector/promises";
 import { Trash2, X, CircleAlert } from "lucide-react";
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import React, { useState, useRef, useEffect } from "react";
 
@@ -28,10 +26,6 @@ interface FormValues {
 }
 
 export default function QuizComponent({ quiz, onDelete }: Props) {
-  const searchParams = useSearchParams();
-  const { course_id } = {
-    course_id: searchParams.get("course_id"),
-  };
   const [isUpdateOpen, setIsUpdateOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [attemptsOpen, setAttemptsOpen] = useState(false);

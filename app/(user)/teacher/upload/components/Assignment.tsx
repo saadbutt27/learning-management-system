@@ -117,6 +117,7 @@ const Assignment: React.FC<AssignmentProps> = ({ courses, status }) => {
           id="topic"
           name="topic"
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-500 focus:border-gray-500 block w-full p-2.5"
+          placeholder="Assignment topic here..."
           required
         />
       </div>
@@ -133,6 +134,7 @@ const Assignment: React.FC<AssignmentProps> = ({ courses, status }) => {
           name="desc"
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-500 focus:border-gray-500 block w-full p-2.5"
           rows={4}
+          placeholder="Assignment description here..."
           required
         ></textarea>
       </div>
@@ -178,7 +180,7 @@ const Assignment: React.FC<AssignmentProps> = ({ courses, status }) => {
 
       <fieldset>
         <p className="block mb-2 text-base font-medium text-gray-900 dark:text-white">
-          Select courses for this lecture
+          Select courses for this assignment
         </p>
         <legend className="sr-only">Checkbox variants</legend>
         {courses

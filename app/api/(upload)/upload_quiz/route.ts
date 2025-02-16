@@ -4,17 +4,17 @@ import { query } from "@/lib/db";
 export async function POST(request: NextRequest) {
   try {
     // Extract data from the request body
-    const {
-      topic,
-      desc,
-      selectedCourses,
-      dueDate,
-      duration,
-      questions,
-    } = await request.json();
+    const { topic, desc, selectedCourses, dueDate, duration, questions } =
+      await request.json();
 
     // Validation: Check required fields
-    if (!topic || !desc || !dueDate || !(selectedCourses?.length > 0) || !duration) {
+    if (
+      !topic ||
+      !desc ||
+      !dueDate ||
+      !(selectedCourses?.length > 0) ||
+      !duration
+    ) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
         INSERT INTO questions (question, ques_opt_A, ques_opt_B, ques_opt_C, ques_opt_D, ques_correct_opt, q_id) 
         VALUES ${questions
           .map(
-            (_: any, index: number) =>
+            (index: number) =>
               `($${index * 7 + 1}, $${index * 7 + 2}, $${index * 7 + 3}, $${
                 index * 7 + 4
               }, $${index * 7 + 5}, $${index * 7 + 6}, $${index * 7 + 7})`
@@ -63,15 +63,16 @@ export async function POST(request: NextRequest) {
           .join(", ")}
       `;
 
-    const questionValues = questions.flatMap((q: any) => [
-      q.question,
-      q.optA,
-      q.optB,
-      q.optC,
-      q.optD,
-      q.correctOpt,
-      quizId,
-    ]);
+    const questionValues = questions.flatMap(
+      (q: {
+        question: string;
+        optA: string;
+        optB: string;
+        optC: string;
+        optD: string;
+        correctOpt: string;
+      }) => [q.question, q.optA, q.optB, q.optC, q.optD, q.correctOpt, quizId]
+    );
 
     await query({ query: questionsInsertQuery, values: questionValues });
 
@@ -79,9 +80,7 @@ export async function POST(request: NextRequest) {
     const courseInsertQuery =
       `
       INSERT INTO quiz_course (q_id, c_id) VALUES ` +
-      selectedCourses
-        .map((_: any, index: number) => `($1, $${index + 2})`)
-        .join(", ") +
+      selectedCourses.map((index: number) => `($1, $${index + 2})`).join(", ") +
       `;`;
 
     const courseValues = [quizId, ...selectedCourses];
