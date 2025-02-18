@@ -4,7 +4,7 @@ import {
   TooltipContent,
   Tooltip,
 } from "@/components/ui/tooltip";
-import { formatDateTime } from "@/lib/dateFormatter";
+import { formatUploadDateTime, formatDueDateTime } from "@/lib/dateFormatter";
 
 type Props = {
   upload_date: string;
@@ -31,8 +31,8 @@ export default function MyTooltip({ upload_date, due_date, isPastDue }: Props) {
           align="start"
           className="text-xs lg:text-sm mb-2 ml-[5.5rem] lg:mr-44 bg-white text-black shadow-md border-black"
         >
-          Upload: {formatDateTime(upload_date)} <br />
-          Due: {formatDateTime(due_date)}
+          Upload: {formatUploadDateTime(upload_date)} <br />
+          Due: {formatDueDateTime(due_date)}
         </TooltipContent>
       </button>
     </Tooltip>

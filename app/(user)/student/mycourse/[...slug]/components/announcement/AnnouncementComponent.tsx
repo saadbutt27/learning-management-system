@@ -1,4 +1,4 @@
-import { formatDateTime } from "@/lib/dateFormatter";
+import { formatUploadDateTime } from "@/lib/dateFormatter";
 import React from "react";
 
 type Props = {
@@ -20,7 +20,7 @@ export default function AnnouncementComponent({ announcement }: Props) {
         </div>
         <p className="self-start">
           <span className="font-semibold">Upload Date</span>:{" "}
-          {formatDateTime(announcement.upload_date)}
+          {formatUploadDateTime(announcement.upload_date)}
         </p>
       </div>
     </li>

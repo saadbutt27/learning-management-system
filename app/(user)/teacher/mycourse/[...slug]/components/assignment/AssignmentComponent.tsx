@@ -98,9 +98,24 @@ export default function AssignmentComponent({ assignment, onDelete }: Props) {
       });
   };
 
-  const currentDate = new Date();
-  const dueDate = new Date(assignment.due_date);
-  const isPastDue = currentDate > dueDate;
+  // Upload date
+  const localUploadDate = new Date(assignment.upload_date).toLocaleString(
+    "en-US",
+    {
+      timeZone: "Asia/Karachi",
+    }
+  );
+
+  const currentDate = new Date(); // Current local time
+  const dueDateUTC = new Date(assignment.due_date); // Due date from DB (UTC)
+
+  // Convert dueDate from UTC to Local Time
+  const dueDateLocal = new Date(
+    dueDateUTC.getTime() + new Date().getTimezoneOffset() * 60000
+  );
+
+  // Compare as local time
+  const isPastDue = currentDate > dueDateLocal;
 
   return (
     <li className="border-t-2 border-black my-2 py-4">
@@ -172,7 +187,7 @@ export default function AssignmentComponent({ assignment, onDelete }: Props) {
                         </button>
                       </div>
                       <MyTooltip
-                        upload_date={assignment.upload_date}
+                        upload_date={localUploadDate}
                         due_date={updatedDate}
                         isPastDue={isPastDue}
                       />
@@ -195,7 +210,7 @@ export default function AssignmentComponent({ assignment, onDelete }: Props) {
                   See Submissions
                 </p>
               </div>
-              <div
+              {/* <div
                 className={
                   (click ? `opacity-100` : `hidden `) +
                   ` my-2 opacity-0 transition-opacity duration-600 ease-in-out`
@@ -227,7 +242,7 @@ export default function AssignmentComponent({ assignment, onDelete }: Props) {
                     Submit
                   </button>
                 </form>
-              </div>
+              </div> */}
               <div>
                 {isModalOpen && (
                   <div

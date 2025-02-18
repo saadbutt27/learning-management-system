@@ -1,7 +1,7 @@
 "use client";
 import MyTooltip from "@/components/reusable/MyTooltip";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatDateTime } from "@/lib/dateFormatter";
+import { formatUploadDateTime } from "@/lib/dateFormatter";
 import { Trash2, X, CircleAlert } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import React, { useState, useRef, useEffect } from "react";
@@ -104,9 +104,24 @@ export default function QuizComponent({ quiz, onDelete }: Props) {
       });
   };
 
-  const currentDate = new Date();
-  const dueDate = new Date(quiz.q_due_date);
-  const isPastDue = currentDate > dueDate;
+  // Upload date
+  const localUploadDate = new Date(quiz.q_upload_date).toLocaleString(
+    "en-US",
+    {
+      timeZone: "Asia/Karachi",
+    }
+  );
+
+  const currentDate = new Date(); // Current local time
+  const dueDateUTC = new Date(quiz.q_due_date); // Due date from DB (UTC)
+
+  // Convert dueDate from UTC to Local Time
+  const dueDateLocal = new Date(
+    dueDateUTC.getTime() + new Date().getTimezoneOffset() * 60000
+  );
+
+  // Compare as local time
+  const isPastDue = currentDate > dueDateLocal;
 
   return (
     <li className="border-t-2 border-black py-4">
@@ -174,7 +189,7 @@ export default function QuizComponent({ quiz, onDelete }: Props) {
                       </button>
                     </div>
                     <MyTooltip
-                      upload_date={quiz.q_upload_date}
+                      upload_date={localUploadDate}
                       due_date={updatedDate}
                       isPastDue={isPastDue}
                     />
@@ -370,7 +385,7 @@ const StudentTable = ({ students }: { students: Student[] }) => (
             </td>
             <td className="px-6 py-4 font-medium whitespace-nowrap">
               {student.upload_date
-                ? formatDateTime(student.upload_date)
+                ? formatUploadDateTime(student.upload_date)
                 : "N/A"}
             </td>
             <td className="px-6 py-4 font-medium tracking-widest whitespace-nowrap">

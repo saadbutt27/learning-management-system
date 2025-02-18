@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { formatDateTime } from "@/lib/dateFormatter";
+import { formatDueDateTime } from "@/lib/dateFormatter";
 import clsx from "clsx";
 import Link from "next/link";
 
@@ -46,8 +46,8 @@ export default function Attendance() {
               date_of_attendance: string;
               is_marked: boolean;
             }) => {
-              // Call formatDateTime function to get the formatted date and time
-              const formattedDateTime = formatDateTime(
+              // Call formatDueDateTime function to get the formatted date and time
+              const formattedDateTime = formatDueDateTime(
                 session.date_of_attendance
               );
 

@@ -25,6 +25,7 @@ type Assignment = {
   upload_date: string;
   file: string;
   topic: string;
+  is_edit_allowed_after_submission: boolean;
 };
 
 export default function Assignment() {

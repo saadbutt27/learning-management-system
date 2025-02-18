@@ -1,5 +1,5 @@
 import { TableCell, TableRow } from "@/components/ui/table";
-import { formatDateTime } from "@/lib/dateFormatter";
+import { formatDueDateTime } from "@/lib/dateFormatter";
 import React from "react";
 
 type Props = {
@@ -8,7 +8,7 @@ type Props = {
 };
 
 export default function Row({ date_of_attendance, attendance_status }: Props) {
-  const dateTime = formatDateTime(date_of_attendance);
+  const dateTime = formatDueDateTime(date_of_attendance);
   const [date, time] = [dateTime.slice(0, 11), dateTime.slice(12)];
   return (
     <TableRow className="lg:text-base text-xs">

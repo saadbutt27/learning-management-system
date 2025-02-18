@@ -27,9 +27,27 @@ export default function QuizComponent({ quiz }: Props) {
     student_id: searchParams.get("student_id"),
   };
 
-  const currentDate = new Date();
-  const dueDate = new Date(quiz.q_due_date);
-  const isPastDue = currentDate > dueDate;
+  // const currentDate = new Date();
+  // const dueDate = new Date(quiz.q_due_date);
+  // const isPastDue = currentDate > dueDate;
+  // Upload date
+  const localUploadDate = new Date(quiz.q_upload_date).toLocaleString(
+    "en-US",
+    {
+      timeZone: "Asia/Karachi",
+    }
+  );
+
+  const currentDate = new Date(); // Current local time
+  const dueDateUTC = new Date(quiz.q_due_date); // Due date from DB (UTC)
+
+  // Convert dueDate from UTC to Local Time
+  const dueDateLocal = new Date(
+    dueDateUTC.getTime() + new Date().getTimezoneOffset() * 60000
+  );
+
+  // Compare as local time
+  const isPastDue = currentDate > dueDateLocal;
 
   return (
     <li className="border-t-2 border-black my-2 py-4">
@@ -43,7 +61,7 @@ export default function QuizComponent({ quiz }: Props) {
               </div>
               <div className="flex items-center gap-x-2 self-start order-last mt-2 lg:mt-0">
                 <MyTooltip
-                  upload_date={quiz.q_upload_date}
+                  upload_date={localUploadDate}
                   due_date={quiz.q_due_date}
                   isPastDue={isPastDue}
                 />

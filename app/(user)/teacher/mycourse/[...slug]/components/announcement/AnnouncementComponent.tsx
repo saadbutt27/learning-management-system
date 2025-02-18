@@ -1,5 +1,5 @@
 // import MyTooltip from "@/components/reusable/MyTooltip";
-import { formatDateTime } from "@/lib/dateFormatter";
+import { formatUploadDateTime } from "@/lib/dateFormatter";
 import { CircleAlert, Trash2, X } from "lucide-react";
 import React, { useRef, useState } from "react";
 
@@ -203,7 +203,7 @@ export default function AnnouncementComponent({
                     </div>
                     <p className="text-base lg:text-lg font-medium">
                       <span className="font-semibold">Upload Date</span>:{" "}
-                      {formatDateTime(announcement.upload_date)}
+                      {formatUploadDateTime(announcement.upload_date)}
                     </p>
                   </div>
                   {/* //   )} */}

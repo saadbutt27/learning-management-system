@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
 
     // Construct the SQL query dynamically
     const lectureInsertQuery = `INSERT INTO course_material (m_topic, m_desc, m_upload_date, m_file)
-       VALUES ($1, $2, CURRENT_TIMESTAMP, $3) RETURNING at_id;
+       VALUES ($1, $2, CURRENT_TIMESTAMP, $3) RETURNING m_id;
       `;
     const lectureValues = [topic, desc, fileLink || null];
     const lectureResult = await query({
@@ -37,9 +37,12 @@ export async function POST(request: NextRequest) {
     // Insert course relations into the lecture_course table
     const courseInsertQuery =
       `
-      INSERT INTO lecture_course (m_id, c_id) VALUES ` +
-      selectedCourses.map((index: number) => `($1, $${index + 2})`).join(", ") +
+      INSERT INTO material_course (m_id, c_id) VALUES ` +
+      [...selectedCourses.keys()]
+        .map((index) => `($1, $${index + 2})`)
+        .join(", ") +
       `;`;
+    `;`;
 
     const courseValues = [lectureId, ...selectedCourses];
     await query({ query: courseInsertQuery, values: courseValues });

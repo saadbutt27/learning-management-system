@@ -1,7 +1,14 @@
-export const formatDateTime = (dateTime: string) => {
+export const formatUploadDateTime = (dateTime: string) => {
   const date = new Date(dateTime);
-  const utcDate = new Date(date.getTime() + date.getTimezoneOffset() * 60000); // Convert to UTC
-  const dat: string = utcDate.toString();
+  const dat: string = date.toString();
+  const dateTimeParts: string[] = dat.split(/[ ]/);
+  return `${dateTimeParts[1]} ${dateTimeParts[2]} ${
+    dateTimeParts[3]
+  } ${tConvert(dateTimeParts[4])}`;
+};
+export const formatDueDateTime = (dateTime: string) => {
+  const date = new Date(dateTime).toUTCString();
+  const dat: string = date.toString();
   const dateTimeParts: string[] = dat.split(/[ ]/);
   return `${dateTimeParts[1]} ${dateTimeParts[2]} ${
     dateTimeParts[3]

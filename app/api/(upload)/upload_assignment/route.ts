@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
     const courseInsertQuery =
       `
       INSERT INTO assignment_course (at_id, c_id) VALUES ` +
-      selectedCourses.map((index: number) => `($1, $${index + 2})`).join(", ") +
+      [...selectedCourses.keys()].map(index => `($1, $${index + 2})`).join(", ") +
       `;`;
 
     const courseValues = [assignmentId, ...selectedCourses];

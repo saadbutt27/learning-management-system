@@ -1,4 +1,4 @@
-import { formatDateTime } from "@/lib/dateFormatter";
+import { formatUploadDateTime } from "@/lib/dateFormatter";
 import React from "react";
 import Link from "next/link";
 
@@ -33,7 +33,7 @@ export default function Material({
             )}
             <p>
               <span className="font-medium">Upload Date:</span>{" "}
-              {formatDateTime(uploadDate)}{" "}
+              {formatUploadDateTime(uploadDate)}{" "}
             </p>
           </div>
         </div>

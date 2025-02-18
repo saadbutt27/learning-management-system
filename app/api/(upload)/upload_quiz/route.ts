@@ -53,9 +53,9 @@ export async function POST(request: NextRequest) {
     // Insert questions into the `questions` table
     const questionsInsertQuery = `
         INSERT INTO questions (question, ques_opt_A, ques_opt_B, ques_opt_C, ques_opt_D, ques_correct_opt, q_id) 
-        VALUES ${questions
+        VALUES ${[...questions.keys()]
           .map(
-            (index: number) =>
+            (index) =>
               `($${index * 7 + 1}, $${index * 7 + 2}, $${index * 7 + 3}, $${
                 index * 7 + 4
               }, $${index * 7 + 5}, $${index * 7 + 6}, $${index * 7 + 7})`
@@ -80,8 +80,11 @@ export async function POST(request: NextRequest) {
     const courseInsertQuery =
       `
       INSERT INTO quiz_course (q_id, c_id) VALUES ` +
-      selectedCourses.map((index: number) => `($1, $${index + 2})`).join(", ") +
+      [...selectedCourses.keys()]
+        .map((index) => `($1, $${index + 2})`)
+        .join(", ") +
       `;`;
+    `;`;
 
     const courseValues = [quizId, ...selectedCourses];
     await query({ query: courseInsertQuery, values: courseValues });
