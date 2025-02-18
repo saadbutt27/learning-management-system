@@ -84,7 +84,6 @@ export async function POST(request: NextRequest) {
         .map((index) => `($1, $${index + 2})`)
         .join(", ") +
       `;`;
-    `;`;
 
     const courseValues = [quizId, ...selectedCourses];
     await query({ query: courseInsertQuery, values: courseValues });
