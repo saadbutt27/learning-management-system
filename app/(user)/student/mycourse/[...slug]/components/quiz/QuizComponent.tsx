@@ -27,16 +27,9 @@ export default function QuizComponent({ quiz }: Props) {
     student_id: searchParams.get("student_id"),
   };
 
-  // const currentDate = new Date();
-  // const dueDate = new Date(quiz.q_due_date);
-  // const isPastDue = currentDate > dueDate;
-  // Upload date
-  const localUploadDate = new Date(quiz.q_upload_date).toLocaleString(
-    "en-US",
-    {
-      timeZone: "Asia/Karachi",
-    }
-  );
+  const localUploadDate = new Date(quiz.q_upload_date).toLocaleString("en-US", {
+    timeZone: "Asia/Karachi",
+  });
 
   const currentDate = new Date(); // Current local time
   const dueDateUTC = new Date(quiz.q_due_date); // Due date from DB (UTC)
@@ -71,7 +64,10 @@ export default function QuizComponent({ quiz }: Props) {
             <div className="mt-2 flex justify-between flex-wrap">
               {compareDate(quiz.q_due_date) ? (
                 <>
-                  <span className="cursor-not-allowed">Quiz Closed</span>
+                  <div>
+                    <p className="">Quiz Closed</p>
+                    <span className="">Not Atempted ❌</span>
+                  </div>
                   <p className="">{`Duration: ${quiz.q_time}mins`}</p>
                 </>
               ) : !quiz.attempt ? (
