@@ -58,7 +58,7 @@ export default function Assignment() {
         });
     }
   }, [status, course_id, teacher_id, student_id, session?.user.accessToken]);
-  
+
   if (status === "authenticated" && assignments && assignments.length > 0) {
     return (
       <TooltipProvider delayDuration={100}>
@@ -68,7 +68,11 @@ export default function Assignment() {
             {assignments.length > 0
               ? assignments.map((assignment: Assignment, index: number) => {
                   return (
-                    <AssignmentComponent assignment={assignment} key={index} />
+                    <AssignmentComponent
+                      assignment={assignment}
+                      s_id={session?.user.s_id || "stxxx"}
+                      key={index}
+                    />
                   );
                 })
               : "NO ASSIGNMENTS"}
