@@ -91,3 +91,40 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+export async function PATCH(request: NextRequest) {
+  try {
+    const { assignment_id, student_id, fileLink } = await request.json();
+
+    if (!assignment_id || !student_id || !fileLink) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      );
+    }
+
+    let updateQuery = `UPDATE assignment_submissions SET assignment_file = $1, upload_date = CURRENT_TIMESTAMP 
+      WHERE at_id = $2 AND s_id = $3;`;
+    const updateValues = [fileLink, assignment_id, student_id];
+
+    const updateResult = await query({
+      query: updateQuery,
+      values: updateValues,
+    });
+
+    if (!updateResult) {
+      return NextResponse.json(
+        { error: "Failed to update assignment submission" },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Error in PATCH request:", error);
+    return NextResponse.json(
+      { error: "Failed to update assignment submission" },
+      { status: 500 }
+    );
+  }
+}

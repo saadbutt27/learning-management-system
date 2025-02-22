@@ -59,7 +59,9 @@ export default function AssignmentComponent({ assignment, s_id }: Props) {
 
   const uploadFileToAWS = async (file: File) => {
     try {
-      const presignedURL = `${process.env.NEXT_PUBLIC_URL}/api/presigned?fileName=${encodeURIComponent(
+      const presignedURL = `${
+        process.env.NEXT_PUBLIC_URL
+      }/api/presigned?fileName=${encodeURIComponent(
         file.name
       )}&contentType=${encodeURIComponent(file.type)}`;
 
@@ -86,20 +88,23 @@ export default function AssignmentComponent({ assignment, s_id }: Props) {
           uploadedFile = await uploadFileToAWS(selectedFile);
         }
 
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_URL}/api/student_assignment_submission`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              assignment_id: assignment.assignment_id,
-              student_id: s_id,
-              fileLink: uploadedFile?.fileUrl ?? null,
-            }),
-          }
-        );
+        const url = `${process.env.NEXT_PUBLIC_URL}/api/student_assignment_submission`;
+        const method = isSubmitted ? "PATCH" : "POST"; // Use PATCH if already submitted
+
+        const response = await fetch(url, {
+          method,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            assignment_id: assignment.assignment_id,
+            student_id: s_id,
+            fileLink: uploadedFile?.fileUrl ?? null,
+          }),
+        });
 
         if (!response.ok) throw new Error("Failed to submit assignment");
+
+        // Re-fetch the submission status to update UI (including updated file)
+        await checkSubmissionStatus();
 
         setSelectedFile(null);
         setClick((prev) => !prev);
@@ -111,7 +116,7 @@ export default function AssignmentComponent({ assignment, s_id }: Props) {
         setUploading(false);
       }
     },
-    [selectedFile, assignment.assignment_id, s_id]
+    [selectedFile, assignment.assignment_id, s_id, isSubmitted, checkSubmissionStatus]
   );
 
   const localUploadDate = new Date(assignment.upload_date).toLocaleString(
@@ -172,22 +177,68 @@ export default function AssignmentComponent({ assignment, s_id }: Props) {
 
             <button
               className={`border-2 border-black py-1 px-4 rounded-md text-white bg-black ${
-                isSubmissionAllowed ? "cursor-pointer" : "opacity-30 cursor-not-allowed"
+                isSubmissionAllowed
+                  ? "cursor-pointer"
+                  : "opacity-30 cursor-not-allowed"
               }`}
               onClick={() => setClick((prev) => !prev)}
               disabled={!isSubmissionAllowed}
             >
-              {click ? "Close" : isSubmitted ? "Edit Assignment" : "Submit Assignment"}
+              {click
+                ? "Close"
+                : isSubmitted
+                ? "Edit Assignment"
+                : "Submit Assignment"}
             </button>
 
             {click && (
-              <form onSubmit={handleSubmit} className="w-full transition-opacity duration-500">
-                <input type="file" onChange={handleFileSelect} required />
-                {selectedFile && <p>File: {selectedFile.name}</p>}
-                <button type="submit" disabled={uploading}>
-                  {uploading ? "Uploading..." : "Submit"}
-                </button>
-              </form>
+              <div
+                className={`my-2 transition-all duration-500 ease-in-out overflow-hidden ${
+                  click
+                    ? "opacity-100 max-h-screen scale-100"
+                    : "opacity-0 max-h-0 scale-95"
+                }`}
+              >
+                <form onSubmit={handleSubmit}>
+                  <label
+                    htmlFor="assignment_file"
+                    className="block mb-2 text-base font-medium text-gray-900 dark:text-white"
+                  >
+                    Upload assignment
+                  </label>
+                  <input
+                    type="file"
+                    id="assignment_file"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-500 focus:border-gray-500 block w-full p-2.5"
+                    aria-describedby="user_assignment_help"
+                    onChange={handleFileSelect}
+                    required
+                  />
+                  {selectedFile && (
+                    <p className="text-blue-600 py-1.5">
+                      File selected: {selectedFile.name}
+                    </p>
+                  )}
+                  <div
+                    className="text-sm text-gray-500 p-2"
+                    id="user_assignment_help"
+                  >
+                    Upload pdf/doc/jpeg/png
+                  </div>
+                  <button
+                    type="submit"
+                    className={`text-white font-medium rounded-lg text-sm px-5 py-2 my-2 lg:float-right
+                        ${
+                          uploading
+                            ? "bg-gray-400 cursor-not-allowed"
+                            : "bg-gray-800 hover:bg-gray-900"
+                        }`}
+                    disabled={uploading}
+                  >
+                    {uploading ? "Uploading..." : "Submit"}
+                  </button>
+                </form>
+              </div>
             )}
           </div>
         </div>
