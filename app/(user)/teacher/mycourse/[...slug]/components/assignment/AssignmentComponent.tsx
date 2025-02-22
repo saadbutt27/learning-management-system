@@ -1,8 +1,11 @@
 "use client";
 import Link from "next/link";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { X, Trash2, CircleAlert } from "lucide-react";
 import MyTooltip from "@/components/reusable/MyTooltip";
+import { Skeleton } from "@/components/ui/skeleton";
+import { formatUploadDateTime } from "@/lib/dateFormatter";
+import { useSearchParams } from "next/navigation";
 
 type Props = {
   assignment: {
@@ -29,6 +32,8 @@ export default function AssignmentComponent({ assignment, onDelete }: Props) {
   const [click, clickResult] = useState(false);
   const [isUpdateOpen, setIsUpdateOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [attemptsOpen, setAttemptsOpen] = useState(false);
+
   const [updatedDate, setUpdatedDate] = useState<string>(assignment.due_date);
   const formRef = useRef<HTMLFormElement>(null);
   let formValues: FormValues;
@@ -77,6 +82,13 @@ export default function AssignmentComponent({ assignment, onDelete }: Props) {
   };
   const closeModal = () => {
     setIsModalOpen(false);
+  };
+
+  const handleOpenAttemptsModal = () => {
+    setAttemptsOpen(true);
+  };
+  const closeAttemptsModal = () => {
+    setAttemptsOpen(false);
   };
 
   const handleDelete = async () => {
@@ -203,51 +215,14 @@ export default function AssignmentComponent({ assignment, onDelete }: Props) {
                     Download Assignment
                   </Link>
                 )}
-                <p
-                  className="hover:text-gray-600 font-semibold underline"
-                  onClick={() => clickResult(!click)}
-                >
-                  See Submissions
-                </p>
               </div>
-              {/* <div
-                className={
-                  (click ? `opacity-100` : `hidden `) +
-                  ` my-2 opacity-0 transition-opacity duration-600 ease-in-out`
-                }
-              >
-                <form action="">
-                  <label
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                    htmlFor="user_avatar"
-                  >
-                    Upload file
-                  </label>
-                  <input
-                    className="block w-full text-sm text-gray-900 border-2 border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none"
-                    aria-describedby="user_avatar_help"
-                    id="user_avatar"
-                    type="file"
-                  />
-                  <div
-                    className="mt-1 text-sm text-gray-500 dark:text-gray-300"
-                    id="user_avatar_help"
-                  >
-                    Upload pdf/doc/jpeg/png
-                  </div>
-                  <button
-                    type="button"
-                    className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2 my-2 lg:float-right"
-                  >
-                    Submit
-                  </button>
-                </form>
-              </div> */}
+
+              {/*  Delete confoirmation modal */}
               <div>
                 {isModalOpen && (
                   <div
                     id="popup-modal"
-                    className={`flex items-center justify-center fixed top-0 left-[10%] right-[10%] lg:left-0 z-50 p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full`}
+                    className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center top-0 left-[10%] right-[10%] lg:left-0 z-50 p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full`}
                   >
                     <div className="relative w-full max-w-md max-h-full">
                       <div className="relative bg-white border-2 border-gray-300 rounded-lg shadow dark:bg-gray-700">
@@ -280,6 +255,59 @@ export default function AssignmentComponent({ assignment, onDelete }: Props) {
                   </div>
                 )}
               </div>
+
+              <div className="mt-2 group">
+                <button
+                  className="flex items-center hover:text-gray-600 font-semibold underline"
+                  onClick={handleOpenAttemptsModal}
+                >
+                  See Attempts
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                    className="w-4 h-4 ml-1 transition-transform transform-gpu group-hover:translate-x-1 group-hover:duration-200"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+                    />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Attempts modal */}
+              <div>
+                {attemptsOpen && (
+                  <div
+                    id="popup-modal"
+                    className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 p-4"
+                  >
+                    <div className="relative w-full min-w-[300px] max-w-4xl bg-white border-2 border-gray-300 rounded-lg shadow dark:bg-gray-700 p-6 overflow-auto max-h-[80vh]">
+                      {/* Header */}
+                      <div className="flex items-start justify-between">
+                        <h2 className="sm:text-2xl text-xl font-semibold mb-4">
+                          Assignment Submissions
+                        </h2>
+                        <button
+                          data-modal-hide="popup-modal"
+                          type="button"
+                          className="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 lg:text-sm text-xs font-medium lg:px-5 lg:py-2.5 px-3 py-1.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
+                          onClick={closeAttemptsModal}
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      </div>
+
+                      {/* Modal Content */}
+                      <SeeAttempts assignment_id={assignment.assignment_id} />
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -287,3 +315,222 @@ export default function AssignmentComponent({ assignment, onDelete }: Props) {
     </li>
   );
 }
+
+interface Student {
+  s_id: number;
+  s_name: string;
+  upload_date: string | null;
+  marks: number | null;
+  total_marks: number;
+  assignment_file: string;
+}
+
+const SeeAttempts = ({ assignment_id }: { assignment_id: number }) => {
+  const searchParams = useSearchParams();
+  const course_id = searchParams.get("course_id");
+  const teacher_id = searchParams.get("teacher_id");
+
+  const [students, setStudents] = useState<Student[] | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStudents = async () => {
+      if (!assignment_id || !teacher_id || !course_id) return;
+
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_URL}/api/student_assignment_attempts?a_id=${assignment_id}&t_id=${teacher_id}&c_id=${course_id}`
+        );
+        const data = await res.json();
+        console.log("data: ", data);
+        setStudents(data);
+        console.log("students: ", students);
+      } catch (error) {
+        console.error("Error fetching student submissions data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStudents();
+  }, [assignment_id, teacher_id, course_id]);
+
+  return (
+    <div className="select-none">
+      {loading ? (
+        <SkeletonTable />
+      ) : students && students.length > 0 ? (
+        <StudentTable students={students} />
+      ) : (
+        <p className="flex justify-center items-center text-xl font-bold">
+          There are no attempts!
+        </p>
+      )}
+    </div>
+  );
+};
+
+const StudentTable = ({ students }: { students: Student[] }) => {
+  const [studentData, setStudentData] = useState<Student[]>(students);
+  const [grades, setGrades] = useState<{ [key: number]: number | null }>({});
+
+  // Function to handle input change for grades
+  const handleGradeChange = (studentId: number, value: string) => {
+    const grade = value === "" ? null : Number(value);
+    setGrades((prev) => ({ ...prev, [studentId]: grade }));
+  };
+
+  // Function to submit marks
+  const submitGrade = async (studentId: number) => {
+    if (grades[studentId] === null || grades[studentId] === undefined) {
+      alert("Please enter a valid mark before submitting.");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/student_assignment_attempts", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ studentId, marks: grades[studentId] }),
+      });
+
+      if (response.ok) {
+        alert("Marks submitted successfully!");
+
+        // Update the marks in state without reloading
+        setStudentData((prevData) =>
+          prevData.map((student) =>
+            student.s_id === studentId
+              ? { ...student, marks: grades[studentId] }
+              : student
+          )
+        );
+
+        // Clear input field after submission
+        setGrades((prev) => ({ ...prev, [studentId]: null }));
+      } else {
+        alert("Failed to submit marks. Try again.");
+      }
+    } catch (error) {
+      console.error("Error submitting marks:", error);
+    }
+  };
+
+  return (
+    <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+      <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+        <thead className="text-base text-gray-700 uppercase bg-gray-50 border-b-2 border-b-gray-700">
+          <tr>
+            <th className="px-6 py-3">Student ID</th>
+            <th className="px-6 py-3">Name</th>
+            <th className="px-6 py-3">Submission Date</th>
+            <th className="px-6 py-3">Submitted File</th>
+            <th className="px-6 py-3">
+              Marks (out of{" "}
+              {studentData[0].total_marks
+                ? studentData[0].total_marks
+                : "Not updated"}
+              )
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {studentData.map((student) => (
+            <tr
+              key={student.s_id}
+              className={`text-gray-900 text-sm border-b ${
+                student.marks === null
+                  ? "bg-white even:bg-gray-100"
+                  : student.marks === student.total_marks
+                  ? "bg-green-500 text-white"
+                  : student.marks === 0
+                  ? "bg-red-600 text-white"
+                  : ""
+              }`}
+            >
+              <td className="px-6 py-4">{student.s_id}</td>
+              <td className="px-6 py-4 font-medium whitespace-nowrap">
+                {student.s_name}
+              </td>
+              <td className="px-6 py-4 font-medium whitespace-nowrap">
+                {student.upload_date
+                  ? formatUploadDateTime(student.upload_date)
+                  : "N/A"}
+              </td>
+              <td className="px-6 py-4 font-medium tracking-widest whitespace-nowrap">
+                {student.assignment_file === null ? (
+                  "Not Submitted"
+                ) : (
+                  <Link
+                    href={student.assignment_file}
+                    target="_blank"
+                    className="font-semibold underline"
+                  >
+                    Submitted file
+                  </Link>
+                )}
+              </td>
+              <td className="px-6 py-4 font-medium tracking-widest whitespace-nowrap">
+                {student.marks === null
+                  ? student.assignment_file
+                    ? "Pending"
+                    : "Not Attempted"
+                  : `${student.marks} / ${student.total_marks}`}
+              </td>
+              <td className="px-6 py-4 flex gap-2">
+                <input
+                  type="number"
+                  className="w-20 px-2 py-1 border rounded"
+                  placeholder="Marks"
+                  value={grades[student.s_id] ?? ""}
+                  onChange={(e) =>
+                    handleGradeChange(student.s_id, e.target.value)
+                  }
+                />
+                <button
+                  className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  onClick={() => submitGrade(student.s_id)}
+                >
+                  Submit
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+const SkeletonTable = () => (
+  <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+    <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+      <thead className="text-base text-gray-700 uppercase bg-gray-50 border-b-2 border-b-gray-700">
+        <tr>
+          <th className="px-6 py-3">Student ID</th>
+          <th className="px-6 py-3">Name</th>
+          <th className="px-6 py-3">Submission Date</th>
+          <th className="px-6 py-3">Quiz Marks</th>
+        </tr>
+      </thead>
+      <tbody>
+        {[...Array(5)].map((_, index) => (
+          <tr key={index}>
+            <td className="px-2 py-4">
+              <Skeleton className="w-full h-10 bg-gray-200" />
+            </td>
+            <td className="px-2 py-4">
+              <Skeleton className="w-full h-10 bg-gray-200" />
+            </td>
+            <td className="px-2 py-4">
+              <Skeleton className="w-full h-10 bg-gray-200" />
+            </td>
+            <td className="px-2 py-4">
+              <Skeleton className="w-full h-10 bg-gray-200" />
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+);

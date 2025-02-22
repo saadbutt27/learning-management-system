@@ -144,37 +144,6 @@ export default function AnnouncementComponent({
             <div className="my-2 lg:my-0">
               <div className="flex flex-col lg:items-end">
                 <div className="flex items-center gap-x-2">
-                  {/* {isUpdateOpen ? (
-                    <div className="px-1 py-2 text-center">
-                      <form action="" ref={formRef} onSubmit={handleSubmit}>
-                        <div>
-                          <div className="flex justify-between items-center">
-                            <label
-                              htmlFor="dueDate"
-                              className="text-left block mb-2 text-base font-medium text-gray-900 dark:text-white"
-                            >
-                              Update Due Date
-                            </label>
-                            <button onClick={handleOpenUpdate}>
-                              <X className="w-6 h-6 cursor-pointer" />
-                            </button>
-                          </div>
-                          <input
-                            type="datetime-local"
-                            id="dueDate"
-                            name="dueDate"
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-500 focus:border-gray-500 block w-full p-2.5"
-                            placeholder=""
-                          />
-                          <div className="flex items-center gap-x-2 lg:justify-end">
-                            <button className="text-white bg-black hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 mt-4 text-center">
-                              Update
-                            </button>
-                          </div>
-                        </div>
-                      </form>
-                    </div>
-                  ) : ( */}
                   <div className="flex flex-col">
                     <div className="lg:self-end space-x-2">
                       {isUpdateOpen ? (
@@ -206,62 +175,13 @@ export default function AnnouncementComponent({
                       {formatUploadDateTime(announcement.upload_date)}
                     </p>
                   </div>
-                  {/* //   )} */}
                 </div>
-                {/* {assignment.file && (
-                <Link
-                  href={assignment.file}
-                  target={"_blank"}
-                  className="hover:underline hover:text-gray-600 "
-                >
-                  Download Assignment
-                </Link>
-              )}
-              <p
-                className="hover:underline hover:text-gray-600 cursor-pointer"
-                onClick={() => clickResult(!click)}
-              >
-                See Submissions
-              </p>
-            </div>
-            <div
-              className={
-                (click ? `opacity-100` : `hidden `) +
-                ` my-2 opacity-0 transition-opacity duration-600 ease-in-out`
-              }
-            >
-              <form action="">
-                <label
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                  htmlFor="user_avatar"
-                >
-                  Upload file
-                </label>
-                <input
-                  className="block w-full text-sm text-gray-900 border-2 border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none"
-                  aria-describedby="user_avatar_help"
-                  id="user_avatar"
-                  type="file"
-                />
-                <div
-                  className="mt-1 text-sm text-gray-500 dark:text-gray-300"
-                  id="user_avatar_help"
-                >
-                  Upload pdf/doc/jpeg/png
-                </div>
-                <button
-                  type="button"
-                  className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2 my-2 lg:float-right"
-                >
-                  Submit
-                </button>
-              </form>
-            </div> */}
+
                 <div>
                   {isModalOpen && (
                     <div
                       id="popup-modal"
-                      className={`flex items-center justify-center fixed top-0 left-[10%] right-[10%] lg:left-0 z-50 p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full`}
+                      className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center top-0 left-[10%] right-[10%] lg:left-0 z-50 p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full`}
                     >
                       <div className="relative w-full max-w-md max-h-full">
                         <div className="relative bg-white border-2 border-gray-300 rounded-lg shadow dark:bg-gray-700">

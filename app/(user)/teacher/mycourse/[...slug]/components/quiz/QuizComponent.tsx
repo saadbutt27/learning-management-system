@@ -105,12 +105,9 @@ export default function QuizComponent({ quiz, onDelete }: Props) {
   };
 
   // Upload date
-  const localUploadDate = new Date(quiz.q_upload_date).toLocaleString(
-    "en-US",
-    {
-      timeZone: "Asia/Karachi",
-    }
-  );
+  const localUploadDate = new Date(quiz.q_upload_date).toLocaleString("en-US", {
+    timeZone: "Asia/Karachi",
+  });
 
   const currentDate = new Date(); // Current local time
   const dueDateUTC = new Date(quiz.q_due_date); // Due date from DB (UTC)
@@ -203,7 +200,7 @@ export default function QuizComponent({ quiz, onDelete }: Props) {
               {isModalOpen && (
                 <div
                   id="popup-modal"
-                  className={`flex items-center justify-center fixed top-0 left-[10%] right-[10%] lg:left-0 z-50 p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full`}
+                  className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 p-4 top-0 left-[10%] right-[10%] lg:left-0 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full`}
                 >
                   <div className="relative w-full max-w-md max-h-full">
                     <div className="relative bg-white border-2 border-gray-300 rounded-lg shadow dark:bg-gray-700">
@@ -273,25 +270,26 @@ export default function QuizComponent({ quiz, onDelete }: Props) {
               {attemptsOpen && (
                 <div
                   id="popup-modal"
-                  className={`flex items-center justify-center fixed top-0 left-[10%] right-[10%] lg:left-0 z-50 p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full`}
+                  className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 p-4"
                 >
-                  <div className="relative w-full max-w-fit max-h-full">
-                    <div className="relative bg-white border-2 border-gray-300 rounded-lg shadow dark:bg-gray-700 p-6">
-                      <div className="flex items-start justify-between text-center gap-y-5">
-                        <h2 className="sm:text-2xl text-xl font-semibold mb-4">
-                          Quiz Submissions
-                        </h2>
-                        <button
-                          data-modal-hide="popup-modal"
-                          type="button"
-                          className="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 lg:text-sm text-xs font-medium lg:px-5 lg:py-2.5 px-3 py-1.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
-                          onClick={closeAttemptsModal}
-                        >
-                          <X className="w-5 h-5" />
-                        </button>
-                      </div>
-                      <SeeAttempts quiz_id={quiz.q_id} />
+                  <div className="relative w-full min-w-[300px] max-w-3xl bg-white border-2 border-gray-300 rounded-lg shadow dark:bg-gray-700 p-6 overflow-auto max-h-[80vh]">
+                    {/* Header */}
+                    <div className="flex items-start justify-between">
+                      <h2 className="sm:text-2xl text-xl font-semibold mb-4">
+                        Quiz Submissions
+                      </h2>
+                      <button
+                        data-modal-hide="popup-modal"
+                        type="button"
+                        className="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 lg:text-sm text-xs font-medium lg:px-5 lg:py-2.5 px-3 py-1.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
+                        onClick={closeAttemptsModal}
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
                     </div>
+
+                    {/* Modal Content */}
+                    <SeeAttempts quiz_id={quiz.q_id} />
                   </div>
                 </div>
               )}
