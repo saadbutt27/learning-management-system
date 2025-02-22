@@ -388,7 +388,7 @@ const StudentTable = ({ students }: { students: Student[] }) => {
     }
 
     try {
-      const response = await fetch("/api/student_assignment_attempts", {
+      const response = await fetch("/api/teacher_assignment_attempts", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ studentId, marks: grades[studentId] }),
