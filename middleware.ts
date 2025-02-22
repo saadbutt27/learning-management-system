@@ -3,17 +3,22 @@ import { NextResponse } from "next/server";
 
 export default withAuth(
   function middleware(req) {
-    if (
-      req.nextUrl.pathname.startsWith("/teacher") &&
-      req.nextauth.token?.role !== "teacher"
-    ) {
-      return NextResponse.redirect(new URL("/student", req.url));
-    }
-    if (
-      req.nextUrl.pathname.startsWith("/student") &&
-      req.nextauth.token?.role !== "student"
-    ) {
-      return NextResponse.redirect(new URL("/teacher", req.url));
+    const rolePaths = {
+      teacher: "/teacher",
+      student: "/student",
+      admin: "/admin",
+    };
+
+    const userRole = req.nextauth.token?.role;
+    const unauthorizedRedirect = Object.entries(rolePaths).find(
+      ([role, path]) =>
+        req.nextUrl.pathname.startsWith(path) && userRole !== role
+    );
+
+    if (unauthorizedRedirect) {
+      return NextResponse.redirect(
+        new URL(rolePaths[userRole as keyof typeof rolePaths] || "/", req.url)
+      );
     }
   },
   {
@@ -24,5 +29,5 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ["/dashboard", "/", "/student/:path*", "/teacher/:path*"],
+  matcher: ["/dashboard", "/", "/student/:path*", "/teacher/:path*", "/admin/:path*"],
 };

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { query } from "@/lib/db";
 import { signJwtAccessToken } from "@/lib/jwt";
-import { comparePassword } from '@/lib/passwordEncryption';
+import { comparePassword } from "@/lib/passwordEncryption";
 
 export async function POST(request: NextRequest) {
   const { userId, password } = await request.json();
@@ -11,7 +11,13 @@ export async function POST(request: NextRequest) {
   let role;
   let res;
 
-  if (userId[0] === "t" && userId[1] === "c") {
+  if (userId.startsWith("admin")) {
+    res = await query({
+      query: "select distinct * from admin where id = $1",
+      values: [userId],
+    });
+    role = "admin";
+  } else if (userId.startsWith("tc")) {
     res = await query({
       query: "select distinct * from teacher where t_id = $1",
       values: [userId],
@@ -34,12 +40,12 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const isCorrectPassword: boolean = await comparePassword(password, res[0].password);
+  const isCorrectPassword: boolean = await comparePassword(
+    password,
+    res[0].password
+  );
   if (!isCorrectPassword) {
-    return NextResponse.json(
-      { message: "Wrong Password" },
-      { status: 401 }
-    );
+    return NextResponse.json({ message: "Wrong Password" }, { status: 401 });
   }
 
   const { ...userWithoutPass } = res[0];
