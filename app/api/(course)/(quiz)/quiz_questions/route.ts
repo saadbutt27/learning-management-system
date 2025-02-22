@@ -38,10 +38,12 @@ export async function GET(req: NextRequest) {
     }
 
     const res = await query({
-      query: `SELECT qu.question, qu.ques_opt_A, qu.ques_opt_B, qu.ques_opt_C, qu.ques_opt_D, qu.ques_correct_opt, qu.q_id, q.q_time 
-                FROM questions qu 
-                JOIN quiz q ON q.q_id = qu.q_id 
-                WHERE q.c_id = $1 AND qu.q_id = $2`,
+      query: `SELECT 
+                qu.question, qu.ques_opt_A, qu.ques_opt_B, qu.ques_opt_C, qu.ques_opt_D, qu.ques_correct_opt, qu.q_id, q.q_time 
+              FROM questions qu 
+              JOIN quiz q ON q.q_id = qu.q_id 
+              JOIN quiz_course qc ON qc.c_id = $1
+              AND qu.q_id = $2`,
       values: [c_id, q_id],
     });
 

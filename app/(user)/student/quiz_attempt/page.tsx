@@ -400,7 +400,7 @@ function QuizAttempt() {
             {isModalOpen && (
               <div
                 id="popup-modal"
-                className={`flex items-center justify-center fixed top-0 left-[10%] right-[10%] lg:left-0 z-50 p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full`}
+                className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center top-0 left-[10%] right-[10%] lg:left-0 z-50 p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full`}
               >
                 <div className="relative w-full max-w-md max-h-full">
                   <div className="relative bg-white border-2 border-gray-300 rounded-lg shadow dark:bg-gray-700">

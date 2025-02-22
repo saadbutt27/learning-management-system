@@ -2,7 +2,6 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import React from "react";
-import { compareDate } from "@/lib/dateFormatter";
 import MyTooltip from "@/components/reusable/MyTooltip";
 import { MoveRight } from "lucide-react";
 
@@ -61,17 +60,20 @@ export default function QuizComponent({ quiz }: Props) {
               </div>
             </div>
 
-            <div className="mt-2 flex justify-between flex-wrap">
-              {compareDate(quiz.q_due_date) ? (
-                <>
-                  <div>
+            <div className="mt-2 flex justify-between items-center flex-wrap">
+              <div>
+                {isPastDue ? (
+                  <>
                     <p className="">Quiz Closed</p>
-                    <span className="">Not Atempted ❌</span>
-                  </div>
-                  <p className="">{`Duration: ${quiz.q_time}mins`}</p>
-                </>
-              ) : !quiz.attempt ? (
-                <>
+                    {!quiz.attempt ? (
+                      <span className="text-red-600">Not Attempted ❌</span>
+                    ) : (
+                      <span className="text-green-600">Attempted ✔</span>
+                    )}
+                  </>
+                ) : quiz.attempt ? (
+                  <span className="text-green-600">Attempted ✔</span>
+                ) : (
                   <Link
                     href={{
                       pathname: "/student/quiz_attempt/",
@@ -82,14 +84,16 @@ export default function QuizComponent({ quiz }: Props) {
                     Go to Quiz
                     <MoveRight className="w-5 h-5 ml-1.5 transition-transform transform-gpu group-hover:translate-x-1 group-hover:duration-200" />
                   </Link>
-                  <p className="">{`Duration: ${quiz.q_time} mins`}</p>
-                </>
-              ) : (
-                <>
-                  <span className="text-green-600">Attempted ✔</span>
+                )}
+              </div>
+
+              {/* Score is always on the right */}
+              <div className="text-right">
+                <p className="">{`Duration: ${quiz.q_time} mins`}</p>
+                {quiz.attempt && (
                   <p className="text-lg">{`Score: ${quiz.marks_obtained}/${quiz.total_marks}`}</p>
-                </>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </div>
