@@ -63,11 +63,11 @@ export default async function MyLayout({
                 Computer Science
               </Link>
             </div>
-            <div className="py-2 px-4 bg-slate-100 mr-2 mb-2 lg:mb-0 rounded-md">
+            {/* <div className="py-2 px-4 bg-slate-100 mr-2 mb-2 lg:mb-0 rounded-md">
               <Link href={"#"} className="hover:underline">
                 CS-2103-CS-222-BS-CS-4C
               </Link>
-            </div>
+            </div> */}
           </div>
         </div>
         <div>{children}</div>
