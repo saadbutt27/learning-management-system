@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
       values: [assignment_id, student_id],
     });
 
-    console.log(submission);
+    // console.log(submission);
 
     return NextResponse.json(
       {
