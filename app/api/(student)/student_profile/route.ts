@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { query } from "@/lib/db";
-import { comparePassword, hashPassword } from '@/lib/passwordEncryption';
+import { comparePassword, hashPassword } from "@/lib/passwordEncryption";
 
 export async function GET(req: NextRequest) {
   try {
@@ -8,8 +8,11 @@ export async function GET(req: NextRequest) {
     const { s_id } = { s_id: searchParams.get("s_id") };
 
     const res = await query({
-      query:
-        "SELECT s_id, s_name, p_id, semester_num, s_image FROM student WHERE s_id = $1;",
+      query: `SELECT 
+          s.s_id, s.s_name, s.p_id, p.program_name, s.semester_num, s.s_image 
+        FROM student s
+        JOIN programs p ON s.p_id = p.p_id 
+        WHERE s_id = $1;`,
       values: [s_id!],
     });
 
@@ -51,7 +54,7 @@ export async function DELETE(request: NextRequest) {
   const s_id = searchParams.get("s_id");
   // const session = await getSession();
   //   const { objectUrl } = await request.json();
-  console.log("s_id: ", s_id);
+  // console.log("s_id: ", s_id);
   try {
     // Update to store the reference to the profile picture into the student table
     await query({
@@ -61,7 +64,7 @@ export async function DELETE(request: NextRequest) {
     // if (session?.user) {
     //   session.user.image = null;
     // }
-    console.log("Deleted from databse");
+    // console.log("Deleted from database");
     return NextResponse.json({ code: 1 });
   } catch (e) {
     return NextResponse.json({
@@ -79,7 +82,10 @@ export async function PATCH(req: NextRequest) {
     values: [s_id],
   });
 
-  const isCorrectPassword: boolean = await comparePassword(oldPassword, res[0].password);
+  const isCorrectPassword: boolean = await comparePassword(
+    oldPassword,
+    res[0].password
+  );
   if (!isCorrectPassword) {
     return NextResponse.json(
       { message: "Wrong Old Password" },

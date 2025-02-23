@@ -16,8 +16,8 @@ interface UserProfile {
   s_id: string;
   s_name: string;
   s_image: string;
-  // userPassword: string;
   p_id: string;
+  program_name: string;
   semester_num: string;
 }
 
@@ -247,7 +247,7 @@ export default function ProfilePage() {
                 type="text"
                 name="stProgram"
                 id="stProgram"
-                value={user.p_id}
+                value={user.p_id + " - " + user.program_name}
                 className="w-full sm:w-2/3 bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg focus:ring-gray-500 focus:border-gray-500 p-2.5 cursor-not-allowed sel"
                 disabled
               />
