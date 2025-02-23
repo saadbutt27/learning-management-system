@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
         SELECT  
           p.p_id AS program_id,  
           p.program_name AS program_name,  
-          cta.c_id AS course_id,  
+          cta.assign_id AS course_id,  
           c.course_name AS course_name,  
           cta.t_id AS t_id,  
           c.semester_number AS semester_number,  
