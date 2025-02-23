@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { query } from "@/lib/db";
 
+// Function to map numeric correct option to A-D
+function mapCorrectOption(option: string): string {
+  return ["A", "B", "C", "D"][+option - 1] || "A"; // Default to 'A' if invalid
+}
+
 export async function POST(request: NextRequest) {
   try {
     // Extract data from the request body
@@ -71,7 +76,7 @@ export async function POST(request: NextRequest) {
         optC: string;
         optD: string;
         correctOpt: string;
-      }) => [q.question, q.optA, q.optB, q.optC, q.optD, q.correctOpt, quizId]
+      }) => [q.question, q.optA, q.optB, q.optC, q.optD, mapCorrectOption(q.correctOpt), quizId]
     );
 
     await query({ query: questionsInsertQuery, values: questionValues });
@@ -95,6 +100,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, quizId });
   } catch (error) {
+    await query({
+      query: "ROLLBACK;",
+      values: [],
+    });
     console.error("Error in POST request:", error);
     return NextResponse.json(
       { error: "Failed to insert quiz data" },

@@ -180,7 +180,7 @@ const Quiz: React.FC<QuizProps> = ({ courses, status }) => {
       }
 
       // Reset form and state
-      // form.reset();
+      form.reset();
 
       // setPdf([]);
       // setSelectedFile(null);
@@ -400,6 +400,8 @@ const Quiz: React.FC<QuizProps> = ({ courses, status }) => {
               type="number"
               id="correctOpt"
               name="correctOpt"
+              min={1}
+              max={4}
               value={val.correctOpt || ""}
               onChange={(e) =>
                 handleChange(index, "correctOpt", e.target.value)
