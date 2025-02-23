@@ -28,28 +28,39 @@ interface Course {
 }
 
 interface Person {
-  id: number;
+  id: string;
   name: string;
+}
+
+interface Program {
+  p_id: string;
+  program_name: string;
 }
 
 interface CourseAssignment {
   id: number;
-  courses: string[];
+  course_id: number;
   assignedTo: string;
   role: "Student" | "Teacher";
 }
+
+const sections: string[] = ["A", "B", "C", "D"];
 
 export default function AdminPanel() {
   const [assignments, setAssignments] = useState<CourseAssignment[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
   const [teachers, setTeachers] = useState<Person[]>([]);
   const [students, setStudents] = useState<Person[]>([]);
-  const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
+  const [programs, setPrograms] = useState<Program[]>([]);
+  const [selectedCourse, setSelectedCourse] = useState<number | null>(null);
+  const [selectedSection, setSelectedSection] = useState<string>("");
   const [teacher, setTeacher] = useState("");
   const [student, setStudent] = useState("");
   const [courseName, setCourseName] = useState("");
   const [courseCode, setCourseCode] = useState("");
-  const [creditHours, setCreditHours] = useState(1);
+  const [creditHours, setCreditHours] = useState<number | null>(null);
+  const [semesterNumber, setSemesterNumber] = useState<number | null>(null);
+  const [program, setProgram] = useState("");
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -78,6 +89,18 @@ export default function AdminPanel() {
 
     const fetchStudents = async () => {
       try {
+        const response = await fetch("/api/programs");
+        if (!response.ok) throw new Error("Failed to fetch programs");
+        const data = await response.json();
+        setPrograms(data);
+      } catch (error) {
+        console.error("Error fetching programs:", error);
+        toast.error("Failed to load programs");
+      }
+    };
+
+    const fetchPrograms = async () => {
+      try {
         const response = await fetch("/api/students");
         if (!response.ok) throw new Error("Failed to fetch students");
         const data = await response.json();
@@ -93,33 +116,121 @@ export default function AdminPanel() {
     fetchStudents();
   }, []);
 
-  const handleAssign = (role: "Student" | "Teacher") => {
+  const handleAssign = async (role: "Student" | "Teacher") => {
     const assignee = role === "Teacher" ? teacher : student;
-    if (selectedCourses.length === 0 || !assignee) {
+    if (!selectedCourse || !assignee) {
       toast.error(`Please select ${role} and courses before assigning.`);
       return;
     }
+
+    if (role === "Teacher") {
+      try {
+        const response = await fetch("/api/assign_teachers", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            t_id: assignee,
+            c_id: selectedCourse,
+            section: selectedSection, // Modify as needed
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to assign teacher");
+        }
+
+        toast.success(`Teacher ${assignee} assigned successfully.`);
+      } catch (error) {
+        toast.error("Failed to assign teacher.");
+        console.error(error);
+      }
+    } else if (role === "Student") {
+      try {
+        const response = await fetch("/api/enroll_students", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            s_id: assignee,
+            c_id: selectedCourse,
+            section: selectedSection, // Modify as needed
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to assign course to student");
+        }
+
+        toast.success(`Student ${assignee} assigned successfully.`);
+      } catch (error) {
+        toast.error("Failed to assign course to student.");
+        console.error(error);
+      }
+    }
+
     const newAssignment: CourseAssignment = {
       id: assignments.length + 1,
-      courses: selectedCourses,
+      course_id: selectedCourse,
       assignedTo: assignee,
       role,
     };
     setAssignments([...assignments, newAssignment]);
     toast.success(`${role} ${assignee} assigned to selected courses.`);
-    role === "Teacher" ? setTeacher("") : setStudent("");
-    setSelectedCourses([]);
+    // role === "Teacher" ? setTeacher("") : setStudent("");
+    // setSelectedCourse(null);
+    // setSelectedSection("");
+    // setTeacher("");
+    // setStudent("");
   };
 
   const handleCreateCourse = async () => {
-    if (!courseName || !courseCode) {
-      toast.error("Please enter course name and code.");
+    if (
+      !courseName ||
+      !courseCode ||
+      !creditHours ||
+      !semesterNumber ||
+      !program
+    ) {
+      toast.error("Please enter course details.");
       return;
     }
     // API call to create course can be added here
+    try {
+      const response = await fetch("/api/create_course", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          course_name: courseName,
+          course_code: courseCode,
+          credit_hours: creditHours,
+          semester_number: semesterNumber,
+          p_id: program,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to assign course to student");
+      }
+
+      const responseData = await response.json();
+      toast.success(
+        `Course created successfully. This is the course id: ${responseData.c_id}`
+      );
+    } catch (error) {
+      toast.error("Failed to create course.");
+      console.error(error);
+    }
     toast.success(`Course ${courseName} created.`);
     setCourseName("");
     setCourseCode("");
+    setCreditHours(null);
+    setSemesterNumber(null);
+    setProgram("");
   };
 
   return (
@@ -130,14 +241,26 @@ export default function AdminPanel() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex gap-4">
-            <Select onValueChange={(value) => setSelectedCourses([value])}>
+            <Select onValueChange={(value) => setSelectedCourse(+value)}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select Courses" />
               </SelectTrigger>
               <SelectContent>
                 {courses.map((course) => (
-                  <SelectItem key={course.c_id} value={course.course_name}>
+                  <SelectItem key={course.c_id} value={course.c_id.toString()}>
                     {course.course_code} - {course.course_name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select onValueChange={(value) => setSelectedSection(value)}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select Section" />
+              </SelectTrigger>
+              <SelectContent>
+                {sections.map((section) => (
+                  <SelectItem key={section} value={section}>
+                    {section}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -148,7 +271,7 @@ export default function AdminPanel() {
               </SelectTrigger>
               <SelectContent>
                 {teachers.map((person) => (
-                  <SelectItem key={person.id} value={person.name}>
+                  <SelectItem key={person.id} value={person.id}>
                     {person.id} - {person.name}
                   </SelectItem>
                 ))}
@@ -165,14 +288,26 @@ export default function AdminPanel() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex gap-4">
-            <Select onValueChange={(value) => setSelectedCourses([value])}>
+            <Select onValueChange={(value) => setSelectedCourse(+value)}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select Courses" />
               </SelectTrigger>
               <SelectContent>
                 {courses.map((course) => (
-                  <SelectItem key={course.c_id} value={course.course_name}>
+                  <SelectItem key={course.c_id} value={course.c_id.toString()}>
                     {course.course_code} - {course.course_name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select onValueChange={(value) => setSelectedSection(value)}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select Section" />
+              </SelectTrigger>
+              <SelectContent>
+                {sections.map((section) => (
+                  <SelectItem key={section} value={section}>
+                    {section}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -183,13 +318,13 @@ export default function AdminPanel() {
               </SelectTrigger>
               <SelectContent>
                 {students.map((person) => (
-                  <SelectItem key={person.id} value={person.name}>
+                  <SelectItem key={person.id} value={person.id}>
                     {person.id} - {person.name}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <Button onClick={() => handleAssign("Student")}>Assign</Button>
+            <Button onClick={() => handleAssign("Student")}>Enroll</Button>
           </div>
         </CardContent>
       </Card>
@@ -198,29 +333,51 @@ export default function AdminPanel() {
         <CardHeader>
           <CardTitle>Create New Course</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <Input
-            type="text"
-            placeholder="Course Name"
-            value={courseName}
-            onChange={(e) => setCourseName(e.target.value)}
-          />
-          <Input
-            type="text"
-            placeholder="Course Code"
-            value={courseCode}
-            onChange={(e) => setCourseCode(e.target.value)}
-          />
-          <Input
-            type="number"
-            min={1}
-            max={3}
-            placeholder="Credit Hours"
-            value={creditHours}
-            onChange={(e) => setCreditHours(Number(e.target.value))}
-          />
-          <Button onClick={handleCreateCourse}>Create Course</Button>
-        </CardContent>
+        <form onSubmit={handleCreateCourse}>
+          <CardContent className="space-y-4">
+            <Input
+              type="text"
+              placeholder="Course Name"
+              value={courseName}
+              onChange={(e) => setCourseName(e.target.value)}
+            />
+            <Input
+              type="text"
+              placeholder="Course Code"
+              value={courseCode}
+              onChange={(e) => setCourseCode(e.target.value)}
+            />
+            <Input
+              type="number"
+              min={1}
+              max={3}
+              placeholder="Credit Hours"
+              value={creditHours ?? ""}
+              onChange={(e) => setCreditHours(Number(e.target.value))}
+            />
+            <Input
+              type="number"
+              min={1}
+              max={8}
+              placeholder="Semeter number"
+              value={semesterNumber ?? ""}
+              onChange={(e) => setSemesterNumber(Number(e.target.value))}
+            />
+            <Select onValueChange={setProgram}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select Program" />
+              </SelectTrigger>
+              <SelectContent>
+                {programs.map((program) => (
+                  <SelectItem key={program.p_id} value={program.p_id}>
+                    {program.p_id} - {program.program_name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button type="submit">Create Course</Button>
+          </CardContent>
+        </form>
       </Card>
     </div>
   );
