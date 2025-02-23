@@ -11,24 +11,24 @@ export async function POST(request: NextRequest) {
   let role;
   let res;
 
-  if (userId.startsWith("admin")) {
-    res = await query({
-      query: "select distinct * from admin where id = $1",
-      values: [userId],
-    });
-    role = "admin";
-  } else if (userId.startsWith("tc")) {
+  if (userId.startsWith("tc")) {
     res = await query({
       query: "select distinct * from teacher where t_id = $1",
       values: [userId],
     });
     role = "teacher";
-  } else {
+  } else if (userId.startsWith("st")) {
     res = await query({
       query: "select distinct * from student where s_id = $1",
       values: [userId],
     });
     role = "student";
+  } else {
+    res = await query({
+      query: "select distinct * from admin where id = $1",
+      values: [userId],
+    });
+    role = "admin";
   }
 
   const userExist = res.length;
