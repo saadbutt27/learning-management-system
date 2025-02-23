@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
     const { t_id } = { t_id: searchParams.get("t_id") };
 
     const res = await query({
-      query: "SELECT t_id, t_name, t_image FROM teacher WHERE t_id = $1;",
+      query: "SELECT t.t_id, t.t_name, t.t_image FROM teacher t WHERE t_id = $1;",
       values: [t_id!],
     });
 
