@@ -339,12 +339,10 @@ const SeeAttempts = ({ assignment_id }: { assignment_id: number }) => {
 
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_URL}/api/student_assignment_attempts?a_id=${assignment_id}&t_id=${teacher_id}&c_id=${course_id}`
+          `${process.env.NEXT_PUBLIC_URL}/api/teacher_assignment_attempts?a_id=${assignment_id}&t_id=${teacher_id}&c_id=${course_id}`
         );
         const data = await res.json();
-        console.log("data: ", data);
         setStudents(data);
-        console.log("students: ", students);
       } catch (error) {
         console.error("Error fetching student submissions data:", error);
       } finally {
