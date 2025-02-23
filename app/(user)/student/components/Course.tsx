@@ -29,7 +29,7 @@ type Props = {
   course_id: string;
   teacher_id: string;
   student_id: string;
-  semester_num: string;
+  semester_number: string;
   section: string;
   program_name: string;
 };
@@ -49,7 +49,7 @@ const CourseComponent = ({
   course_id,
   teacher_id,
   student_id,
-  semester_num,
+  semester_number,
   section,
   program_name,
 }: Props) => {
@@ -76,7 +76,7 @@ const CourseComponent = ({
                 query: { course_id, teacher_id, student_id },
               }}
             >
-              <p className="text-base sm:text-xl">{`${course_name} (${semester_num}${section})`}</p>
+              <p className="text-base sm:text-xl">{`${course_name} (${semester_number}${section})`}</p>
             </Link>
           </span>
         </div>

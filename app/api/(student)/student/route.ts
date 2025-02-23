@@ -17,11 +17,22 @@ export async function GET(request: NextRequest) {
     // Fetch courses based on the provided s_id
     const res = await query({
       query: `
-        SELECT pn.program_name, c.c_id AS course_id, c.c_title AS course_name, c.t_id, c.semester_num, c.section 
-        FROM enroll_assign e 
-        JOIN course c ON e.c_id = c.c_id AND e.s_id = $1
-        LEFT JOIN program p ON c.p_id = p.p_id AND c.semester_num = p.semester_num
-        LEFT JOIN program_name pn ON pn.pn_id = p.pn_id;
+        SELECT  
+          p.p_id AS program_id,  
+          p.program_name AS program_name,  
+          e.c_id AS course_id,  
+          c.course_name AS course_name,  
+          cta.t_id AS t_id,  
+          c.semester_number AS semester_number,  
+          cta.section AS section 
+        FROM enroll_assign e  
+        INNER JOIN course_teacher_assign cta  
+          ON cta.assign_id = e.c_id  
+        INNER JOIN course c  
+          ON c.c_id = cta.c_id  
+        LEFT JOIN programs p  
+          ON p.p_id = c.p_id  
+        WHERE e.s_id = $1;
       `,
       values: [s_id],
     });

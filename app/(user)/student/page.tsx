@@ -7,12 +7,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 type CourseType = {
+  program_id:string;
+  program_name: string;
   course_id: string;
   course_name: string;
   t_id: string;
-  semester_num: string;
+  semester_number: string;
   section: string;
-  program_name: string;
 };
 
 interface ExtendedSession extends Session {
@@ -135,7 +136,7 @@ export default function Studentpage() {
               course_name={course.course_name}
               teacher_id={course.t_id}
               student_id={session.user.s_id}
-              semester_num={course.semester_num}
+              semester_number={course.semester_number}
               section={course.section}
               // course_value={"70"}
               program_name={course.program_name}
