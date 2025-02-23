@@ -28,7 +28,7 @@ type Props = {
   course_id: string;
   teacher_id: string;
   student_id: string;
-  semester_num: string;
+  semester_number: string;
   section: string;
   program_name: string;
 };
@@ -48,7 +48,7 @@ const CourseComponent = ({
   course_id,
   teacher_id,
   student_id,
-  semester_num,
+  semester_number,
   section,
   program_name,
 }: Props) => {
@@ -62,9 +62,13 @@ const CourseComponent = ({
             <div
               className={`${generateGrad()} w-20 h-20 rounded-full flex items-center justify-center`}
             >
-              <span className={`text-white font-bold ${
-                initials.length > 4 ? 'text-lg' : 'text-2xl'
-              }`}>{initials}</span>
+              <span
+                className={`text-white font-bold ${
+                  initials.length > 4 ? "text-lg" : "text-2xl"
+                }`}
+              >
+                {initials}
+              </span>
             </div>
           </div>
           <span className="ml-2">
@@ -75,7 +79,7 @@ const CourseComponent = ({
                 query: { course_id, teacher_id, student_id },
               }}
             >
-              <p className="text-base sm:text-xl">{`${course_name} (${semester_num}${section})`}</p>
+              <p className="text-base sm:text-xl">{`${course_name} (${semester_number}${section})`}</p>
             </Link>
           </span>
         </div>
