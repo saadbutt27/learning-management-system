@@ -29,7 +29,7 @@ interface FormValues {
 }
 
 export default function AssignmentComponent({ assignment, onDelete }: Props) {
-  const [click, clickResult] = useState(false);
+  // const [click, clickResult] = useState(false);
   const [isUpdateOpen, setIsUpdateOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [attemptsOpen, setAttemptsOpen] = useState(false);

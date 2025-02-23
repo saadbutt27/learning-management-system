@@ -5,7 +5,7 @@ import { signOut, useSession } from "next-auth/react";
 import { Session } from "next-auth";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { BookOpenCheck, LogOut, User } from "lucide-react";
+import { LogOut, User } from "lucide-react";
 
 interface ExtendedSession extends Session {
   user: {
@@ -24,8 +24,9 @@ const Navigation = () => {
 
   // console.log("Session: ", session);
 
-  const src = session?.user.s_image;
-  ("https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png");
+  const src =
+    session?.user.s_image ||
+    "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
 
   return (
     <header className="flex items-center justify-between px-8 py-2 border-b-2 shadow-md sticky top-0 z-50 bg-white">

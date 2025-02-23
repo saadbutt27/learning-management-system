@@ -11,14 +11,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+// import {
+//   Table,
+//   TableBody,
+//   TableCell,
+//   TableHead,
+//   TableHeader,
+//   TableRow,
+// } from "@/components/ui/table";
 import { toast } from "sonner";
 
 interface Course {
@@ -114,6 +114,7 @@ export default function AdminPanel() {
     fetchCourses();
     fetchTeachers();
     fetchStudents();
+    fetchPrograms();
   }, []);
 
   const handleAssign = async (role: "Student" | "Teacher") => {

@@ -103,7 +103,7 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    let updateQuery = `UPDATE assignment_submissions SET assignment_file = $1, upload_date = CURRENT_TIMESTAMP 
+    const updateQuery = `UPDATE assignment_submissions SET assignment_file = $1, upload_date = CURRENT_TIMESTAMP 
       WHERE at_id = $2 AND s_id = $3;`;
     const updateValues = [fileLink, assignment_id, student_id];
 
