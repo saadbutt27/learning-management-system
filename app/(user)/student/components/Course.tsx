@@ -72,7 +72,7 @@ const CourseComponent = ({
             <p className="text-xs sm:text-sm">{program_name}</p>
             <Link
               href={{
-                pathname: `/student/mycourse/${course_name}`,
+                pathname: `/student/mycourse/${course_id}`,
                 query: { course_id, teacher_id, student_id },
               }}
             >
