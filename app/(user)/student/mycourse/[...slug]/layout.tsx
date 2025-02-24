@@ -35,14 +35,14 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }) {
   const courseId = (await params).slug;
-  const courseDetails: CourseDetailsType = await getCourseDetails(courseId);
+  const courseDetails: CourseDetailsType[] = await getCourseDetails(courseId);
 
   return {
     title: courseDetails
-      ? `${courseDetails.course_name} - LMS`
+      ? `${courseDetails[0].course_name} - LMS`
       : "Course - LMS",
     description: courseDetails
-      ? `Course dashboard for ${courseDetails.course_name} in the LMS`
+      ? `Course dashboard for ${courseDetails[0].course_name} in the LMS`
       : "Course dashboard in the LMS",
   };
 }
@@ -56,16 +56,16 @@ export default async function MyLayout({
   children: React.ReactNode;
 }) {
   const course_id = (await params).slug;
-  const courseDetails: CourseDetailsType = await getCourseDetails(course_id);
+  const courseDetails: CourseDetailsType[] = await getCourseDetails(course_id);
 
   return (
     <section>
       <div className="md:ml-[90px] mx-6 mb-4">
         <div className="my-4 px-2 pt-2 pb-8 bg-white border-2 shadow-md h-auto flex flex-col items-start">
           <p className="text-3xl sm:text-4xl ml-4 my-2 font-medium tracking-normal leading-relaxed select-none">
-            {courseDetails ? courseDetails.course_name : "Unknown Course"} - {" "}
+            {courseDetails ? courseDetails[0].course_name : "Unknown Course"} -{" "}
             {courseDetails
-              ? courseDetails.semester_number + courseDetails.section
+              ? courseDetails[0].semester_number + courseDetails[0].section
               : "Unknown"}
           </p>
           <div className="mt-4 ml-4 flex flex-wrap">
@@ -86,13 +86,15 @@ export default async function MyLayout({
             </div> */}
             <div className="py-2 px-4 bg-slate-100 mr-2 mb-2 lg:mb-0 rounded-md">
               <Link href={"#"} className="hover:underline">
-                {courseDetails ? courseDetails.program_name : "Unknown Program"}
+                {courseDetails
+                  ? courseDetails[0].program_name
+                  : "Unknown Program"}
               </Link>
             </div>
             <div className="py-2 px-4 bg-slate-100 mr-2 mb-2 lg:mb-0 rounded-md">
               <Link href={"#"} className="hover:underline">
                 {courseDetails
-                  ? `${courseDetails.course_code}-BS-${courseDetails.p_id}-${courseDetails.semester_number}${courseDetails.section}`
+                  ? `${courseDetails[0].course_code}-BS-${courseDetails[0].p_id}-${courseDetails[0].semester_number}${courseDetails[0].section}`
                   : ""}
               </Link>
             </div>

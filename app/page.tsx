@@ -55,7 +55,15 @@ export default function Home() {
               Welcome back, {session?.user?.s_name}! You are logged in.
             </p>
             <div className="flex sm:flex-row flex-col sm:items-baseline items-center gap-2">
-              <Link href={session.user.t_id ? "/teacher" : "/student"}>
+              <Link
+                href={
+                  session.user.t_id
+                    ? "/teacher"
+                    : session.user.s_id
+                    ? "/student"
+                    : "/admin"
+                }
+              >
                 <Button className="mt-4 bg-blue-500 hover:bg-blue-600 text-white">
                   Go to Dashboard
                 </Button>

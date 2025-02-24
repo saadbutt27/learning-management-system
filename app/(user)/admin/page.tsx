@@ -25,6 +25,7 @@ interface Course {
   c_id: number;
   course_name: string;
   course_code: string;
+  semester_number: number;
 }
 
 interface Person {
@@ -48,7 +49,12 @@ const sections: string[] = ["A", "B", "C", "D"];
 
 export default function AdminPanel() {
   const [assignments, setAssignments] = useState<CourseAssignment[]>([]);
+
   const [courses, setCourses] = useState<Course[]>([]);
+  const [semesters, setSemesters] = useState<number[]>([]);
+  const [selectedSemester, setSelectedSemester] = useState<number | null>(null);
+  const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
+
   const [teachers, setTeachers] = useState<Person[]>([]);
   const [students, setStudents] = useState<Person[]>([]);
   const [programs, setPrograms] = useState<Program[]>([]);
@@ -65,10 +71,15 @@ export default function AdminPanel() {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await fetch("/api/course");
+        const response = await fetch("/api/course?course_id=all");
         if (!response.ok) throw new Error("Failed to fetch courses");
-        const data = await response.json();
+        const data: Course[] = await response.json();
         setCourses(data);
+        // Extract unique semester numbers
+        const uniqueSemesters = Array.from(
+          new Set(data.map((course: Course) => course.semester_number))
+        );
+        setSemesters(uniqueSemesters);
       } catch (error) {
         console.error("Error fetching courses:", error);
         toast.error("Failed to load courses");
@@ -117,6 +128,16 @@ export default function AdminPanel() {
     fetchPrograms();
   }, []);
 
+  useEffect(() => {
+    if (selectedSemester !== null) {
+      // Filter courses based on selected semester
+      const filtered = courses.filter(
+        (course) => course.semester_number === selectedSemester
+      );
+      setFilteredCourses(filtered);
+    }
+  }, [selectedSemester, courses]);
+
   const handleAssign = async (role: "Student" | "Teacher") => {
     const assignee = role === "Teacher" ? teacher : student;
     if (!selectedCourse || !assignee) {
@@ -126,7 +147,7 @@ export default function AdminPanel() {
 
     if (role === "Teacher") {
       try {
-        const response = await fetch("/api/assign_teachers", {
+        const response = await fetch("/api/course_assignment", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -166,6 +187,12 @@ export default function AdminPanel() {
         }
 
         toast.success(`Student ${assignee} assigned successfully.`);
+        setStudent("");
+        setTeacher("");
+        setSelectedSemester(null);
+        setSelectedCourse(null);
+        setSelectedSection("");
+
       } catch (error) {
         toast.error("Failed to assign course to student.");
         console.error(error);
@@ -241,13 +268,32 @@ export default function AdminPanel() {
           <CardTitle>Assign Courses to Teachers</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex gap-4">
+          <div className="flex flex-wrap sm:flex-nowrap gap-4">
+            <Select onValueChange={(value) => setSelectedSemester(+value)}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select Semester" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={"s"}>Select a semester</SelectItem>
+                {semesters.map((semester) => (
+                  <SelectItem key={semester} value={semester.toString()}>
+                    {semester}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <Select onValueChange={(value) => setSelectedCourse(+value)}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select Courses" />
               </SelectTrigger>
               <SelectContent>
-                {courses.map((course) => (
+                <SelectItem value={"s"}>
+                  {filteredCourses.length > 0
+                    ? "Select a course"
+                    : "No courses available for this semester"}
+                </SelectItem>
+
+                {filteredCourses.map((course) => (
                   <SelectItem key={course.c_id} value={course.c_id.toString()}>
                     {course.course_code} - {course.course_name}
                   </SelectItem>
@@ -288,13 +334,32 @@ export default function AdminPanel() {
           <CardTitle>Assign Courses to Students</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex gap-4">
+          <div className="flex flex-wrap sm:flex-nowrap gap-4">
+            <Select onValueChange={(value) => setSelectedSemester(+value)}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select Semester" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={"s"}>Select a semester</SelectItem>
+                {semesters.map((semester) => (
+                  <SelectItem key={semester} value={semester.toString()}>
+                    {semester}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <Select onValueChange={(value) => setSelectedCourse(+value)}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select Courses" />
               </SelectTrigger>
               <SelectContent>
-                {courses.map((course) => (
+                <SelectItem value={"s"}>
+                  {filteredCourses.length > 0
+                    ? "Select a course"
+                    : "No courses available for this semester"}
+                </SelectItem>
+
+                {filteredCourses.map((course) => (
                   <SelectItem key={course.c_id} value={course.c_id.toString()}>
                     {course.course_code} - {course.course_name}
                   </SelectItem>
