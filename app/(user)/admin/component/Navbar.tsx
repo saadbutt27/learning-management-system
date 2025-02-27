@@ -5,7 +5,7 @@ import { signOut, useSession } from "next-auth/react";
 import { Session } from "next-auth";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut, User } from "lucide-react";
+import { LogOut, User, School, GraduationCap } from "lucide-react";
 
 interface ExtendedSession extends Session {
   user: {
@@ -249,6 +249,26 @@ const Navigation = () => {
               <li className="flex items-center py-2 px-4 hover:bg-gray-100">
                 <User className="w-6 h-6 mr-4" strokeWidth={1.5} />
                 <p>Profile</p>
+              </li>
+            </Link>
+            <Link
+              href={{
+                pathname: session?.user.a_id ? "/admin/assign" : "#",
+              }}
+            >
+              <li className="flex items-center py-2 px-4 hover:bg-gray-100">
+                <School className="w-6 h-6 mr-4" strokeWidth={1.5} />
+                <p>Assign</p>
+              </li>
+            </Link>
+            <Link
+              href={{
+                pathname: session?.user.a_id ? "/admin/enroll" : "#",
+              }}
+            >
+              <li className="flex items-center py-2 px-4 hover:bg-gray-100">
+                <GraduationCap className="w-6 h-6 mr-4" strokeWidth={1.5} />
+                <p>Enroll</p>
               </li>
             </Link>
             <li

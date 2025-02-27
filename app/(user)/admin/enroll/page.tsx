@@ -47,7 +47,7 @@ interface CourseAssignment {
 
 const sections: string[] = ["A", "B", "C", "D"];
 
-export default function AdminPanel() {
+export default function Enroll() {
   const [assignments, setAssignments] = useState<CourseAssignment[]>([]);
 
   const [courses, setCourses] = useState<Course[]>([]);
@@ -86,18 +86,6 @@ export default function AdminPanel() {
       }
     };
 
-    const fetchTeachers = async () => {
-      try {
-        const response = await fetch("/api/teachers");
-        if (!response.ok) throw new Error("Failed to fetch teachers");
-        const data = await response.json();
-        setTeachers(data);
-      } catch (error) {
-        console.error("Error fetching teachers:", error);
-        toast.error("Failed to load teachers");
-      }
-    };
-
     const fetchStudents = async () => {
       try {
         const response = await fetch("/api/programs");
@@ -123,7 +111,6 @@ export default function AdminPanel() {
     };
 
     fetchCourses();
-    fetchTeachers();
     fetchStudents();
     fetchPrograms();
   }, []);
@@ -192,7 +179,6 @@ export default function AdminPanel() {
         setSelectedSemester(null);
         setSelectedCourse(null);
         setSelectedSection("");
-
       } catch (error) {
         toast.error("Failed to assign course to student.");
         console.error(error);
@@ -265,72 +251,6 @@ export default function AdminPanel() {
     <div className="p-6 space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Assign Courses to Teachers</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex flex-wrap sm:flex-nowrap gap-4">
-            <Select onValueChange={(value) => setSelectedSemester(+value)}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select Semester" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={"s"}>Select a semester</SelectItem>
-                {semesters.map((semester) => (
-                  <SelectItem key={semester} value={semester.toString()}>
-                    {semester}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select onValueChange={(value) => setSelectedCourse(+value)}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select Courses" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={"s"}>
-                  {filteredCourses.length > 0
-                    ? "Select a course"
-                    : "No courses available for this semester"}
-                </SelectItem>
-
-                {filteredCourses.map((course) => (
-                  <SelectItem key={course.c_id} value={course.c_id.toString()}>
-                    {course.course_code} - {course.course_name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select onValueChange={(value) => setSelectedSection(value)}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select Section" />
-              </SelectTrigger>
-              <SelectContent>
-                {sections.map((section) => (
-                  <SelectItem key={section} value={section}>
-                    {section}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select onValueChange={setTeacher}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select Teacher" />
-              </SelectTrigger>
-              <SelectContent>
-                {teachers.map((person) => (
-                  <SelectItem key={person.id} value={person.id}>
-                    {person.id} - {person.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button onClick={() => handleAssign("Teacher")}>Assign</Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
           <CardTitle>Enroll Students in Courses</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -393,57 +313,6 @@ export default function AdminPanel() {
             <Button onClick={() => handleAssign("Student")}>Enroll</Button>
           </div>
         </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Create New Course</CardTitle>
-        </CardHeader>
-        <form onSubmit={handleCreateCourse}>
-          <CardContent className="space-y-4">
-            <Input
-              type="text"
-              placeholder="Course Name"
-              value={courseName}
-              onChange={(e) => setCourseName(e.target.value)}
-            />
-            <Input
-              type="text"
-              placeholder="Course Code"
-              value={courseCode}
-              onChange={(e) => setCourseCode(e.target.value)}
-            />
-            <Input
-              type="number"
-              min={1}
-              max={3}
-              placeholder="Credit Hours"
-              value={creditHours ?? ""}
-              onChange={(e) => setCreditHours(Number(e.target.value))}
-            />
-            <Input
-              type="number"
-              min={1}
-              max={8}
-              placeholder="Semeter number"
-              value={semesterNumber ?? ""}
-              onChange={(e) => setSemesterNumber(Number(e.target.value))}
-            />
-            <Select onValueChange={setProgram}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select Program" />
-              </SelectTrigger>
-              <SelectContent>
-                {programs.map((program) => (
-                  <SelectItem key={program.p_id} value={program.p_id}>
-                    {program.p_id} - {program.program_name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button type="submit">Create Course</Button>
-          </CardContent>
-        </form>
       </Card>
     </div>
   );

@@ -1,6 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
 import { query } from "@/lib/db";
 
+export async function GET() {
+  try {
+    const fetchQuery = `
+      SELECT 
+        cta.t_id, 
+        t.t_name, 
+        cta.c_id, 
+        c.course_name, 
+        cta.section
+      FROM course_teacher_assign cta
+      JOIN teacher t ON cta.t_id = t.t_id
+      JOIN course c ON cta.c_id = c.c_id
+      ORDER BY cta.assign_id DESC;
+    `;
+
+    const result = await query({ query: fetchQuery, values: [] });
+
+    return NextResponse.json({ success: true, data: result });
+  } catch (error) {
+    console.error("Error in GET request:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch assigned courses" },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     // Extract data from the request body
