@@ -35,7 +35,10 @@ const handler = NextAuth({
 
         const user = await res.json();
 
-        if (user.message == "Invalid credentials" || user.message == "Wrong Password") {
+        if (
+          user.message == "Invalid credentials" ||
+          user.message == "Wrong Password"
+        ) {
           // Any object returned will be saved in `user` property of the JWT
           return null;
         } else {
@@ -57,15 +60,24 @@ const handler = NextAuth({
       }
       // console.log("trigger: ", trigger);
       if (trigger === "update") {
-        // console.log('session update: ', session)
-        token.s_image = session.user.s_image; // Update profile image
+        // console.log("I am triggered!", trigger);
+        // console.log(session.user);
+        // console.log(token.s_image, token.a_image, token.t_image);
+
+        // Update profile images only if they exist in session.user
+        ["s_image", "a_image", "t_image"].forEach((key) => {
+          if (token[key] || session.user[key]) {
+            token[key] = session.user[key];
+          }
+        });
       }
+
       return { ...token, ...user };
     },
     async session({ session, token }) {
-      // console.log("Token: ", token);  
+      // console.log("Token: ", token);
       session.user = token;
-      // session.user.s_image = token.s_image; 
+      // session.user.s_image = token.s_image;
       // console.log('session: ', session.user)
       return session;
     },

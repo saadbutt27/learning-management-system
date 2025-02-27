@@ -6,17 +6,17 @@ import { Session } from "next-auth";
 
 interface ExtendedSession extends Session {
   user: {
-    t_id: string;
-    t_name: string;
-    t_image?: string;
+    a_id: string;
+    a_name: string;
+    a_image?: string;
   } & Session["user"];
 }
 
-interface UserProfile {
-  t_id: string;
-  t_name: string;
-  t_image: string;
-  // userPassword: string;
+interface AdminProfile {
+  a_id: string;
+  a_name: string;
+  a_image: string;
+  email: string;
 }
 
 export default function ProfilePage() {
@@ -28,25 +28,24 @@ export default function ProfilePage() {
   } = useSession() as {
     data: ExtendedSession | null;
     status: string;
-    // update: () => Promise<Session | null>;
     update: <T>(data: T) => Promise<Session | null>;
   };
-  const [user, setUser] = useState<UserProfile | null>(null);
+  const [user, setUser] = useState<AdminProfile | null>(null);
   const [passUpdated, setPassUpdated] = useState<string | null>(null);
   const [passMatched, setPassMatched] = useState(true);
   const [uploading, setUploading] = useState(false);
 
-  //   console.log("Session(profile):", session);
+//   console.log("Session(profile):", session?.user);
 
   useEffect(() => {
     if (status === "authenticated") {
       fetch(
-        `${process.env.NEXT_PUBLIC_URL}/api/teacher_profile?t_id=${session?.user.t_id}`
+        `${process.env.NEXT_PUBLIC_URL}/api/admin_profile?a_id=${session?.user.a_id}`
       )
         .then((data) => data.json())
         .then((data) => setUser(data));
     }
-  }, [status, session?.user.t_id]);
+  }, [status, session?.user.a_id]);
 
   const uploadFile = (e: ChangeEvent<HTMLInputElement>) => {
     const file: File | null | undefined = e.target.files?.[0];
@@ -74,7 +73,7 @@ export default function ProfilePage() {
               }).then(() => {
                 // Save reference to the object in Postgres (powered by Neon)
                 fetch(
-                  `${process.env.NEXT_PUBLIC_URL}/api/teacher_profile?t_id=${session?.user.t_id}`,
+                  `${process.env.NEXT_PUBLIC_URL}/api/admin_profile?a_id=${session?.user.a_id}`,
                   {
                     method: "PUT",
                     headers: { "Content-Type": "application/json" },
@@ -84,9 +83,10 @@ export default function ProfilePage() {
                   }
                 ).then(async () => {
                   // Update user profile with the new file reference
-                  // update({ user: { s_image: res.signedUrl.split("?")[0] } });
+                  // update({ user: { a_image: res.signedUrl.split("?")[0] } });
+                  console.log(res.signedUrl.split("?")[0]);
                   await update({
-                    user: { s_image: res.signedUrl.split("?")[0] },
+                    user: { a_image: res.signedUrl.split("?")[0] },
                   }); // <=== Updating session here
                 });
               });
@@ -107,7 +107,7 @@ export default function ProfilePage() {
     e.preventDefault(); // Prevent default form submission behavior
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_URL}/api/presigned?fileName=${user?.t_image
+        `${process.env.NEXT_PUBLIC_URL}/api/presigned?fileName=${user?.a_image
           ?.split("/")
           .pop()}`,
         {
@@ -120,7 +120,7 @@ export default function ProfilePage() {
       if (response.ok) {
         // Delete profile picture reference in Postgres (powered by Neon)
         await fetch(
-          `${process.env.NEXT_PUBLIC_URL}/api/teacher_profile?t_id=${session?.user.t_id}`,
+          `${process.env.NEXT_PUBLIC_URL}/api/admin_profile?a_id=${session?.user.a_id}`,
           {
             method: "DELETE",
             headers: {
@@ -129,7 +129,8 @@ export default function ProfilePage() {
           }
         ).then(async () => {
           // Update user profile with the new file reference
-          await update({ user: { t_image: null } });
+          await update({ user: { a_image: null } });
+          console.log(session?.user);
         });
       } else {
         throw new Error("Failed to delete profile picture");
@@ -155,14 +156,14 @@ export default function ProfilePage() {
     }
 
     try {
-      const res = await fetch(`/api/teacher_profile`, {
+      const res = await fetch(`/api/admin_profile`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
         },
         body: JSON.stringify({
-          t_id: session?.user.t_id,
+          a_id: session?.user.a_id,
           oldPassword: (e.target as HTMLFormElement).oldPass.value,
           newPassword: newPassword,
         }),
@@ -190,10 +191,10 @@ export default function ProfilePage() {
 
   if (user) {
     const src =
-      user.t_image ||
+      user.a_image ||
       "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
     return (
-      <div className="md:ml-[80px] m-4 px-2">
+      <div className="m-4 px-2">
         <div className="my-4 px-6 pt-2 pb-8 bg-white border-2 shadow-md h-auto flex flex-col items-start">
           <h1 className="text-3xl text-left font-medium tracking-normal leading-snug select-none">
             My LMS Profile
@@ -204,32 +205,48 @@ export default function ProfilePage() {
           >
             <div className="my-6 flex sm:flex-row flex-col sm:items-center sm:justify-between">
               <label
-                htmlFor="stName"
+                htmlFor="adminName"
                 className="mb-2 mr-16 text-base font-semibold text-gray-900"
               >
                 Name{" "}
               </label>
               <input
                 type="text"
-                name="stName"
-                id="stName"
-                value={user.t_name}
+                name="adminName"
+                id="adminName"
+                value={user.a_name}
                 className="w-full sm:w-2/3 bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg focus:ring-gray-500 focus:border-gray-500 p-2.5 cursor-not-allowed"
                 disabled
               />
             </div>
             <div className="my-6 flex sm:flex-row flex-col sm:items-center sm:justify-between">
               <label
-                htmlFor="stId"
+                htmlFor="adminId"
                 className="mb-2 mr-16 text-base font-semibold text-gray-900"
               >
-                Teacher ID{" "}
+                Admin ID{" "}
               </label>
               <input
                 type="text"
-                name="stId"
-                id="stId"
-                value={user.t_id}
+                name="adminId"
+                id="adminId"
+                value={user.a_id}
+                className="w-full sm:w-2/3 bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg focus:ring-gray-500 focus:border-gray-500 p-2.5 cursor-not-allowed sel"
+                disabled
+              />
+            </div>
+            <div className="my-6 flex sm:flex-row flex-col sm:items-center sm:justify-between">
+              <label
+                htmlFor="email"
+                className="mb-2 mr-0 text-base font-semibold text-gray-900"
+              >
+                Email{" "}
+              </label>
+              <input
+                type="email"
+                name="email"
+                id="email"
+                value={user.email}
                 className="w-full sm:w-2/3 bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg focus:ring-gray-500 focus:border-gray-500 p-2.5 cursor-not-allowed sel"
                 disabled
               />
@@ -250,7 +267,7 @@ export default function ProfilePage() {
                   <AvatarFallback>Profile Picture</AvatarFallback>
                 </Avatar>
                 <div className="flex items-center"></div>
-                {user.t_image && (
+                {user.a_image && (
                   <button
                     className="mb-6 bg-gray-900 hover:bg-gray-900 hover:scale-110 hover:duration-200 text-white w-auto font-medium rounded-md text-sm px-2 py-1"
                     onClick={handleDeleteProfilePic}

@@ -9,9 +9,9 @@ import { LogOut, User } from "lucide-react";
 
 interface ExtendedSession extends Session {
   user: {
-    id: string;
-    name: string;
-    s_image?: string;
+    a_id: string;
+    a_name: string;
+    a_image?: string;
   } & Session["user"];
 }
 
@@ -25,7 +25,7 @@ const Navigation = () => {
   // console.log("Session: ", session);
 
   const src =
-    session?.user.s_image ||
+    session?.user.a_image ||
     "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
 
   return (
@@ -53,7 +53,7 @@ const Navigation = () => {
         </div> */}
         <Link
           href={{
-            pathname: session?.user.id ? "/admin" : "#",
+            pathname: session?.user.a_id ? "/admin" : "#",
           }}
         >
           {" "}
@@ -214,13 +214,13 @@ const Navigation = () => {
               <User className="w-6 h-6 mr-4" />
               <p>
                 {status === "authenticated"
-                  ? session?.user.name || session?.user.name
+                  ? session?.user.a_name
                   : "Loading..."}
               </p>
             </li>
             <Link
               href={{
-                pathname: session?.user.id ? "/admin" : "#",
+                pathname: session?.user.a_id ? "/admin" : "#",
               }}
             >
               <li className="flex items-center py-2 px-4 hover:bg-gray-100">
@@ -241,16 +241,16 @@ const Navigation = () => {
                 <p>Dashboard</p>
               </li>
             </Link>
-            {/* <Link
+            <Link
               href={{
-                pathname: session?.user.id ? "/admin/profile" : "#",
+                pathname: session?.user.a_id ? "/admin/profile" : "#",
               }}
             >
               <li className="flex items-center py-2 px-4 hover:bg-gray-100">
                 <User className="w-6 h-6 mr-4" strokeWidth={1.5} />
                 <p>Profile</p>
               </li>
-            </Link> */}
+            </Link>
             <li
               className="flex items-center py-2 px-4 hover:bg-gray-100"
               onClick={() => void signOut({ callbackUrl: "/login" })}

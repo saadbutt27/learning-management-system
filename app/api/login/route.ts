@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     role = "student";
   } else {
     res = await query({
-      query: "select distinct * from admin where id = $1",
+      query: "select distinct * from admin where a_id = $1",
       values: [userId],
     });
     role = "admin";
