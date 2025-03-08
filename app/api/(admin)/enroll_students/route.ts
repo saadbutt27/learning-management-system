@@ -1,22 +1,32 @@
 import { NextRequest, NextResponse } from "next/server";
 import { query } from "@/lib/db";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    // Extract the s_id from the query parameters
+    const url = new URL(request.url);
+    const s_id = url.searchParams.get("s_id");
     const fetchQuery = `
-      SELECT 
-        cta.t_id, 
-        t.t_name, 
-        cta.c_id, 
-        c.course_name, 
-        cta.section
-      FROM course_teacher_assign cta
-      JOIN teacher t ON cta.t_id = t.t_id
-      JOIN course c ON cta.c_id = c.c_id
-      ORDER BY cta.assign_id DESC;
+      SELECT   
+        s.s_id,
+        s.s_name,
+        e.c_id,  
+        c.course_name,  
+        c.semester_number,  
+        cta.section 
+      FROM enroll_assign e  
+      INNER JOIN student s 
+        ON s.s_id = e.s_id
+      INNER JOIN course_teacher_assign cta  
+        ON cta.assign_id = e.c_id  
+      INNER JOIN course c  
+        ON c.c_id = cta.c_id  
+      LEFT JOIN programs p  
+        ON p.p_id = c.p_id  
+      WHERE e.s_id = $1;
     `;
 
-    const result = await query({ query: fetchQuery, values: [] });
+    const result = await query({ query: fetchQuery, values: [s_id] });
 
     return NextResponse.json({ success: true, data: result });
   } catch (error) {
@@ -47,7 +57,8 @@ export async function POST(request: NextRequest) {
     });
 
     const assignemntId = await query({
-      query: "SELECT assign_id FROM course_teacher_assign WHERE c_id = $1 AND section = $2;",
+      query:
+        "SELECT assign_id FROM course_teacher_assign WHERE c_id = $1 AND section = $2;",
       values: [c_id, section],
     });
 
@@ -56,7 +67,7 @@ export async function POST(request: NextRequest) {
       INSERT INTO enroll_assign (s_id, c_id) 
       VALUES ($1, $2) RETURNING assign_id;
     `;
-    
+
     const values = [s_id, assignemntId[0].assign_id];
     const result = await query({ query: insertQuery, values });
 

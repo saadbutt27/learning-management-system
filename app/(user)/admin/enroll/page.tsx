@@ -11,14 +11,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-// import {
-//   Table,
-//   TableBody,
-//   TableCell,
-//   TableHead,
-//   TableHeader,
-//   TableRow,
-// } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { toast } from "sonner";
 
 interface Course {
@@ -38,17 +38,19 @@ interface Program {
   program_name: string;
 }
 
-interface CourseAssignment {
-  id: number;
-  course_id: number;
-  assignedTo: string;
-  role: "Student" | "Teacher";
+interface StudentEnrollment {
+  s_id: string;
+  s_name: string;
+  c_id: number;
+  course_name: string;
+  semester_number: number;
+  section: string;
 }
 
 const sections: string[] = ["A", "B", "C", "D"];
 
 export default function Enroll() {
-  const [assignments, setAssignments] = useState<CourseAssignment[]>([]);
+  const [enrollment, setEnrollment] = useState<StudentEnrollment[]>([]);
 
   const [courses, setCourses] = useState<Course[]>([]);
   const [semesters, setSemesters] = useState<number[]>([]);
@@ -69,51 +71,76 @@ export default function Enroll() {
   const [program, setProgram] = useState("");
 
   useEffect(() => {
-    const fetchCourses = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch("/api/course?course_id=all");
-        if (!response.ok) throw new Error("Failed to fetch courses");
-        const data: Course[] = await response.json();
-        setCourses(data);
-        // Extract unique semester numbers
-        const uniqueSemesters = Array.from(
-          new Set(data.map((course: Course) => course.semester_number))
-        );
-        setSemesters(uniqueSemesters);
+        const [coursesRes, studentsRes] = await Promise.all([
+          fetch("/api/course?course_id=all"),
+          fetch("/api/students"),
+        ]);
+        if (!coursesRes.ok || !studentsRes.ok)
+          throw new Error("Failed to fetch data");
+
+        const coursesData: Course[] = await coursesRes.json();
+        setCourses(coursesData);
+        setSemesters([
+          ...new Set(coursesData.map((course) => course.semester_number)),
+        ]);
+
+        setStudents(await studentsRes.json());
       } catch (error) {
-        console.error("Error fetching courses:", error);
-        toast.error("Failed to load courses");
+        console.error(error);
+        toast.error("Failed to load data");
       }
     };
-
-    const fetchStudents = async () => {
-      try {
-        const response = await fetch("/api/programs");
-        if (!response.ok) throw new Error("Failed to fetch programs");
-        const data = await response.json();
-        setPrograms(data);
-      } catch (error) {
-        console.error("Error fetching programs:", error);
-        toast.error("Failed to load programs");
-      }
-    };
-
-    const fetchPrograms = async () => {
-      try {
-        const response = await fetch("/api/students");
-        if (!response.ok) throw new Error("Failed to fetch students");
-        const data = await response.json();
-        setStudents(data);
-      } catch (error) {
-        console.error("Error fetching students:", error);
-        toast.error("Failed to load students");
-      }
-    };
-
-    fetchCourses();
-    fetchStudents();
-    fetchPrograms();
+    fetchData();
   }, []);
+
+  // useEffect(() => {
+  //   const fetchCourses = async () => {
+  //     try {
+  //       const response = await fetch("/api/course?course_id=all");
+  //       if (!response.ok) throw new Error("Failed to fetch courses");
+  //       const data: Course[] = await response.json();
+  //       setCourses(data);
+  //       // Extract unique semester numbers
+  //       const uniqueSemesters = Array.from(
+  //         new Set(data.map((course: Course) => course.semester_number))
+  //       );
+  //       setSemesters(uniqueSemesters);
+  //     } catch (error) {
+  //       console.error("Error fetching courses:", error);
+  //       toast.error("Failed to load courses");
+  //     }
+  //   };
+
+  //   const fetchStudents = async () => {
+  //     try {
+  //       const response = await fetch("/api/programs");
+  //       if (!response.ok) throw new Error("Failed to fetch programs");
+  //       const data = await response.json();
+  //       setPrograms(data);
+  //     } catch (error) {
+  //       console.error("Error fetching programs:", error);
+  //       toast.error("Failed to load programs");
+  //     }
+  //   };
+
+  //   const fetchPrograms = async () => {
+  //     try {
+  //       const response = await fetch("/api/students");
+  //       if (!response.ok) throw new Error("Failed to fetch students");
+  //       const data = await response.json();
+  //       setStudents(data);
+  //     } catch (error) {
+  //       console.error("Error fetching students:", error);
+  //       toast.error("Failed to load students");
+  //     }
+  //   };
+
+  //   fetchCourses();
+  //   fetchStudents();
+  //   fetchPrograms();
+  // }, []);
 
   useEffect(() => {
     if (selectedSemester !== null) {
@@ -185,13 +212,13 @@ export default function Enroll() {
       }
     }
 
-    const newAssignment: CourseAssignment = {
-      id: assignments.length + 1,
-      course_id: selectedCourse,
-      assignedTo: assignee,
-      role,
-    };
-    setAssignments([...assignments, newAssignment]);
+    // const newAssignment: CourseAssignment = {
+    //   id: assignments.length + 1,
+    //   course_id: selectedCourse,
+    //   assignedTo: assignee,
+    //   role,
+    // };
+    // setAssignments([...assignments, newAssignment]);
     toast.success(`${role} ${assignee} assigned to selected courses.`);
     // role === "Teacher" ? setTeacher("") : setStudent("");
     // setSelectedCourse(null);
@@ -200,51 +227,22 @@ export default function Enroll() {
     // setStudent("");
   };
 
-  const handleCreateCourse = async () => {
-    if (
-      !courseName ||
-      !courseCode ||
-      !creditHours ||
-      !semesterNumber ||
-      !program
-    ) {
-      toast.error("Please enter course details.");
+  const handleSearchEnrollment = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const s_id = formData.get("s_id");
+    const response = await fetch(`/api/enroll_students?s_id=${s_id}`);
+    if (!response.ok) {
+      toast.error("Failed to fetch enrolled students");
       return;
     }
-    // API call to create course can be added here
-    try {
-      const response = await fetch("/api/create_course", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          course_name: courseName,
-          course_code: courseCode,
-          credit_hours: creditHours,
-          semester_number: semesterNumber,
-          p_id: program,
-        }),
-      });
 
-      if (!response.ok) {
-        throw new Error("Failed to assign course to student");
-      }
-
-      const responseData = await response.json();
-      toast.success(
-        `Course created successfully. This is the course id: ${responseData.c_id}`
-      );
-    } catch (error) {
-      toast.error("Failed to create course.");
-      console.error(error);
-    }
-    toast.success(`Course ${courseName} created.`);
-    setCourseName("");
-    setCourseCode("");
-    setCreditHours(null);
-    setSemesterNumber(null);
-    setProgram("");
+    const enrollmentData = await response.json();
+    if (!enrollmentData.success)
+      toast.error("Failed to fetch enrolled students");
+    setEnrollment(enrollmentData.data);
   };
 
   return (
@@ -254,7 +252,7 @@ export default function Enroll() {
           <CardTitle>Enroll Students in Courses</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex flex-wrap sm:flex-nowrap gap-4">
+          <div className="flex flex-wrap gap-4">
             <Select onValueChange={(value) => setSelectedSemester(+value)}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select Semester" />
@@ -312,6 +310,62 @@ export default function Enroll() {
             </Select>
             <Button onClick={() => handleAssign("Student")}>Enroll</Button>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Enrollments Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Enrolled Students</CardTitle>
+        </CardHeader>
+        <form
+          onSubmit={handleSearchEnrollment}
+          className="p-6 flex items-center gap-2 border-gray-200"
+        >
+          <label htmlFor="s_id" className="text-gray-700 font-medium">
+            Search using Student ID:
+          </label>
+          <Input
+            name="s_id"
+            id="s_id"
+            placeholder="Enter Student ID"
+            className="flex-1 px-4 py-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-gray-500 focus:outline-none"
+          />
+          <Button
+            type="submit"
+            className="bg-black text-white font-semibold px-4 py-2 rounded-lg transition duration-300"
+          >
+            Search
+          </Button>
+        </form>
+
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Student ID</TableHead>
+                <TableHead>Student Name</TableHead>
+                <TableHead>Course ID</TableHead>
+                <TableHead>Course Name</TableHead>
+                <TableHead>Section</TableHead>
+                <TableHead>Semester no.</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {enrollment.map((enroll) => (
+                <TableRow
+                  key={`${enroll.s_id}-${enroll.c_id}-${enroll.section}`}
+                >
+                  <TableCell>{enroll.s_id}</TableCell>
+                  <TableCell>{enroll.s_name}</TableCell>
+                  <TableCell>{enroll.c_id}</TableCell>
+                  <TableCell>{enroll.course_name}</TableCell>
+                  <TableCell>{enroll.section}</TableCell>
+                  <TableCell>{enroll.semester_number}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
     </div>
