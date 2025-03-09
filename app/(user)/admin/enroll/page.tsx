@@ -33,11 +33,6 @@ interface Person {
   name: string;
 }
 
-interface Program {
-  p_id: string;
-  program_name: string;
-}
-
 interface StudentEnrollment {
   s_id: string;
   s_name: string;
@@ -57,18 +52,11 @@ export default function Enroll() {
   const [selectedSemester, setSelectedSemester] = useState<number | null>(null);
   const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
 
-  const [teachers, setTeachers] = useState<Person[]>([]);
   const [students, setStudents] = useState<Person[]>([]);
-  const [programs, setPrograms] = useState<Program[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<number | null>(null);
   const [selectedSection, setSelectedSection] = useState<string>("");
   const [teacher, setTeacher] = useState("");
   const [student, setStudent] = useState("");
-  const [courseName, setCourseName] = useState("");
-  const [courseCode, setCourseCode] = useState("");
-  const [creditHours, setCreditHours] = useState<number | null>(null);
-  const [semesterNumber, setSemesterNumber] = useState<number | null>(null);
-  const [program, setProgram] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -94,53 +82,6 @@ export default function Enroll() {
     };
     fetchData();
   }, []);
-
-  // useEffect(() => {
-  //   const fetchCourses = async () => {
-  //     try {
-  //       const response = await fetch("/api/course?course_id=all");
-  //       if (!response.ok) throw new Error("Failed to fetch courses");
-  //       const data: Course[] = await response.json();
-  //       setCourses(data);
-  //       // Extract unique semester numbers
-  //       const uniqueSemesters = Array.from(
-  //         new Set(data.map((course: Course) => course.semester_number))
-  //       );
-  //       setSemesters(uniqueSemesters);
-  //     } catch (error) {
-  //       console.error("Error fetching courses:", error);
-  //       toast.error("Failed to load courses");
-  //     }
-  //   };
-
-  //   const fetchStudents = async () => {
-  //     try {
-  //       const response = await fetch("/api/programs");
-  //       if (!response.ok) throw new Error("Failed to fetch programs");
-  //       const data = await response.json();
-  //       setPrograms(data);
-  //     } catch (error) {
-  //       console.error("Error fetching programs:", error);
-  //       toast.error("Failed to load programs");
-  //     }
-  //   };
-
-  //   const fetchPrograms = async () => {
-  //     try {
-  //       const response = await fetch("/api/students");
-  //       if (!response.ok) throw new Error("Failed to fetch students");
-  //       const data = await response.json();
-  //       setStudents(data);
-  //     } catch (error) {
-  //       console.error("Error fetching students:", error);
-  //       toast.error("Failed to load students");
-  //     }
-  //   };
-
-  //   fetchCourses();
-  //   fetchStudents();
-  //   fetchPrograms();
-  // }, []);
 
   useEffect(() => {
     if (selectedSemester !== null) {
