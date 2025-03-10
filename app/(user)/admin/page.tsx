@@ -561,10 +561,10 @@ export default function AdminPanel() {
       </div>
 
       {/* Search Bar */}
-      <div className="space-y-4">
+      {/* <div className="space-y-4">
         <h2 className="text-2xl font-bold">Search</h2>
         <Input type="text" placeholder="Search by name, ID, etc." />
-      </div>
+      </div> */}
 
       {/* Upcoming Deadlines */}
       <div className="space-y-4">

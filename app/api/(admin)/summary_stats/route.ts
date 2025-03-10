@@ -27,7 +27,7 @@ export async function GET() {
     });
 
     const totalCoursesQuery = `
-        SELECT COUNT(*) FROM teacher;
+        SELECT COUNT(*) FROM course;
       `;
     const totalCourses = await query({ query: totalCoursesQuery, values: [] });
 
