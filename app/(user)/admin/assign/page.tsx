@@ -19,6 +19,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Course {
   c_id: number;
@@ -44,6 +45,7 @@ const sections = ["A", "B", "C", "D"];
 
 export default function Assign() {
   const [assigned, setAssigned] = useState<CoursesAssigned[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [courses, setCourses] = useState<Course[]>([]);
   const [semesters, setSemesters] = useState<number[]>([]);
   const [selectedSemester, setSelectedSemester] = useState<number | null>(null);
@@ -235,17 +237,27 @@ export default function Assign() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {assigned.map((assignment) => (
-                <TableRow
-                  key={`${assignment.t_id}-${assignment.c_id}-${assignment.section}`}
-                >
-                  <TableCell>{assignment.c_id}</TableCell>
-                  <TableCell>{assignment.course_name}</TableCell>
-                  <TableCell>{assignment.section}</TableCell>
-                  <TableCell>{assignment.t_id}</TableCell>
-                  <TableCell>{assignment.t_name}</TableCell>
-                </TableRow>
-              ))}
+              {assigned.length === 0
+                ? [...Array(5)].map((_, index) => (
+                    <TableRow key={index}>
+                      {[...Array(5)].map((_, cellIndex) => (
+                        <TableCell key={cellIndex}>
+                          <Skeleton className="h-4 w-full" />
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                : assigned.map((assignment) => (
+                    <TableRow
+                      key={`${assignment.t_id}-${assignment.c_id}-${assignment.section}`}
+                    >
+                      <TableCell>{assignment.c_id}</TableCell>
+                      <TableCell>{assignment.course_name}</TableCell>
+                      <TableCell>{assignment.section}</TableCell>
+                      <TableCell>{assignment.t_id}</TableCell>
+                      <TableCell>{assignment.t_name}</TableCell>
+                    </TableRow>
+                  ))}
             </TableBody>
           </Table>
         </CardContent>

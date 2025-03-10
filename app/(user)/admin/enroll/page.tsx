@@ -20,6 +20,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Course {
   c_id: number;
@@ -45,7 +46,9 @@ interface StudentEnrollment {
 const sections: string[] = ["A", "B", "C", "D"];
 
 export default function Enroll() {
-  const [enrollment, setEnrollment] = useState<StudentEnrollment[]>([]);
+  const [enrollment, setEnrollment] = useState<StudentEnrollment[] | null>(
+    null
+  );
 
   const [courses, setCourses] = useState<Course[]>([]);
   const [semesters, setSemesters] = useState<number[]>([]);
@@ -172,6 +175,7 @@ export default function Enroll() {
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
+    setEnrollment([]);
     const formData = new FormData(e.currentTarget);
     const s_id = formData.get("s_id");
     const response = await fetch(`/api/enroll_students?s_id=${s_id}`);
@@ -293,18 +297,29 @@ export default function Enroll() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {enrollment.map((enroll) => (
-                <TableRow
-                  key={`${enroll.s_id}-${enroll.c_id}-${enroll.section}`}
-                >
-                  <TableCell>{enroll.s_id}</TableCell>
-                  <TableCell>{enroll.s_name}</TableCell>
-                  <TableCell>{enroll.c_id}</TableCell>
-                  <TableCell>{enroll.course_name}</TableCell>
-                  <TableCell>{enroll.section}</TableCell>
-                  <TableCell>{enroll.semester_number}</TableCell>
-                </TableRow>
-              ))}
+              {enrollment && enrollment.length === 0
+                ? [...Array(5)].map((_, index) => (
+                    <TableRow key={index}>
+                      {[...Array(6)].map((_, cellIndex) => (
+                        <TableCell key={cellIndex}>
+                          <Skeleton className="h-4 w-full" />
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                : enrollment &&
+                  enrollment.map((enroll) => (
+                    <TableRow
+                      key={`${enroll.s_id}-${enroll.c_id}-${enroll.section}`}
+                    >
+                      <TableCell>{enroll.s_id}</TableCell>
+                      <TableCell>{enroll.s_name}</TableCell>
+                      <TableCell>{enroll.c_id}</TableCell>
+                      <TableCell>{enroll.course_name}</TableCell>
+                      <TableCell>{enroll.section}</TableCell>
+                      <TableCell>{enroll.semester_number}</TableCell>
+                    </TableRow>
+                  ))}
             </TableBody>
           </Table>
         </CardContent>
