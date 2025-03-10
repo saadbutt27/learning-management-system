@@ -5,7 +5,7 @@ import { signOut, useSession } from "next-auth/react";
 import { Session } from "next-auth";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { BookOpenCheck, LogOut, User } from "lucide-react";
+import { LogOut, User } from "lucide-react";
 
 interface ExtendedSession extends Session {
   user: {

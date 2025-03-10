@@ -45,7 +45,6 @@ const sections = ["A", "B", "C", "D"];
 
 export default function Assign() {
   const [assigned, setAssigned] = useState<CoursesAssigned[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
   const [courses, setCourses] = useState<Course[]>([]);
   const [semesters, setSemesters] = useState<number[]>([]);
   const [selectedSemester, setSelectedSemester] = useState<number | null>(null);
