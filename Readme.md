@@ -63,7 +63,7 @@ Learn&Grow is a modern, **role-based LMS** built using **Next.js, PostgreSQL, an
 
 The LMS is live and deployed on **Vercel** for seamless access.  
 
-🔗 **Live Demo:** [https://learning-management-system-beta.vercel.app]  
+🔗 **Live Demo:** https://learning-management-system-beta.vercel.app
 
 ### 🔑 **Test Credentials**  
 - **Student Login:**  
