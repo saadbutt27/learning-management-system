@@ -208,7 +208,7 @@ export default function Assign() {
               <SelectContent>
                 {teachers.map((person) => (
                   <SelectItem key={person.id} value={person.id}>
-                    {person.name}
+                    {person.id} - {person.name}
                   </SelectItem>
                 ))}
               </SelectContent>

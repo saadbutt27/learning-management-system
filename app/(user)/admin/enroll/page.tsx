@@ -49,6 +49,7 @@ export default function Enroll() {
   const [enrollment, setEnrollment] = useState<StudentEnrollment[] | null>(
     null
   );
+  const [loading, setLoading] = useState(false);
 
   const [courses, setCourses] = useState<Course[]>([]);
   const [semesters, setSemesters] = useState<number[]>([]);
@@ -175,18 +176,24 @@ export default function Enroll() {
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
-    setEnrollment([]);
+    setLoading(true);
+    setEnrollment(null);
     const formData = new FormData(e.currentTarget);
     const s_id = formData.get("s_id");
     const response = await fetch(`/api/enroll_students?s_id=${s_id}`);
+    setLoading(false);
+
     if (!response.ok) {
       toast.error("Failed to fetch enrolled students");
       return;
     }
 
     const enrollmentData = await response.json();
-    if (!enrollmentData.success)
+    if (!enrollmentData.success) {
       toast.error("Failed to fetch enrolled students");
+      return;
+    }
+
     setEnrollment(enrollmentData.data);
   };
 
@@ -285,43 +292,50 @@ export default function Enroll() {
         </form>
 
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Student ID</TableHead>
-                <TableHead>Student Name</TableHead>
-                <TableHead>Course ID</TableHead>
-                <TableHead>Course Name</TableHead>
-                <TableHead>Section</TableHead>
-                <TableHead>Semester no.</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {enrollment && enrollment.length === 0
-                ? [...Array(5)].map((_, index) => (
-                    <TableRow key={index}>
-                      {[...Array(6)].map((_, cellIndex) => (
-                        <TableCell key={cellIndex}>
-                          <Skeleton className="h-4 w-full" />
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                : enrollment &&
-                  enrollment.map((enroll) => (
-                    <TableRow
-                      key={`${enroll.s_id}-${enroll.c_id}-${enroll.section}`}
-                    >
-                      <TableCell>{enroll.s_id}</TableCell>
-                      <TableCell>{enroll.s_name}</TableCell>
-                      <TableCell>{enroll.c_id}</TableCell>
-                      <TableCell>{enroll.course_name}</TableCell>
-                      <TableCell>{enroll.section}</TableCell>
-                      <TableCell>{enroll.semester_number}</TableCell>
-                    </TableRow>
-                  ))}
-            </TableBody>
-          </Table>
+          {loading ? (
+            <Table>
+              <TableBody>
+                {[...Array(5)].map((_, index) => (
+                  <TableRow key={index}>
+                    {[...Array(6)].map((_, cellIndex) => (
+                      <TableCell key={cellIndex}>
+                        <Skeleton className="h-4 w-full" />
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          ) : enrollment && enrollment.length > 0 ? (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Student ID</TableHead>
+                  <TableHead>Student Name</TableHead>
+                  <TableHead>Course ID</TableHead>
+                  <TableHead>Course Name</TableHead>
+                  <TableHead>Section</TableHead>
+                  <TableHead>Semester no.</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {enrollment.map((entry) => (
+                  <TableRow key={entry.s_id + entry.c_id}>
+                    <TableCell>{entry.s_id}</TableCell>
+                    <TableCell>{entry.s_name}</TableCell>
+                    <TableCell>{entry.c_id}</TableCell>
+                    <TableCell>{entry.course_name}</TableCell>
+                    <TableCell>{entry.section}</TableCell>
+                    <TableCell>{entry.semester_number}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          ) : (
+            <p className="text-center text-gray-500">
+              No courses found for this student.
+            </p>
+          )}
         </CardContent>
       </Card>
     </div>
