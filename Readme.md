@@ -1,38 +1,79 @@
-# Learning Management System
+# 📚 Learn&Grow LMS  
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+A **full-fledged Learning Management System (LMS)** designed to facilitate **students, teachers, and administrators** in managing courses, assignments, quizzes, and attendance efficiently.  
 
-## Getting Started
+## 🚀 Overview  
+Learn&Grow is a modern, **role-based LMS** built using **Next.js, PostgreSQL, and AWS S3** to provide a seamless learning experience. It allows:  
+- **Admins** to create courses, manage students & teachers, and assign courses.  
+- **Teachers** to upload lectures, assignments, and quizzes, mark attendance, and grade submissions.  
+- **Students** to access course materials, submit assignments, attempt quizzes, and track attendance.  
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🛠️ Tech Stack  
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+| **Technology**  | **Usage**  |
+|----------------|-----------|
+| **Next.js** | Frontend & Backend Framework  |
+| **React.js** | Component-based UI development |
+| **TypeScript** | Strongly-typed JavaScript |
+| **TailwindCSS** | Styling for UI |
+| **ShadCN UI** | Modern UI components |
+| **PostgreSQL** | Relational database (previously MySQL) |
+| **AWS S3** | Cloud storage for files & images |
+| **NextAuth & JWT** | Authentication & session management |
+| **Middleware** | Role-based access control |
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🎯 Features  
 
-## Learn More
+### 🔹 **Admin Panel**  
+- ✅ Create & manage **courses**  
+- ✅ Register **students & teachers**  
+- ✅ Assign courses to teachers  
+- ✅ Enroll students in courses  
 
-To learn more about Next.js, take a look at the following resources:
+### 🔹 **Teacher Dashboard**  
+- ✅ View assigned courses  
+- ✅ Upload **lectures, assignments, quizzes, announcements**  
+- ✅ **Mark attendance** and update records  
+- ✅ View and grade **assignment & quiz submissions**  
+- ✅ **MCQ-based quizzes** (auto-evaluated)  
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 🔹 **Student Dashboard**  
+- ✅ Access enrolled courses  
+- ✅ **Download** lecture & assignment materials  
+- ✅ **Attempt quizzes** (timer-based auto-submit)  
+- ✅ View **attendance records** (present/absent status)  
+- ✅ **Submit assignments**  
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 🔹 **Profile Management (Admin, Teacher, Student)**  
+- ✅ View and update **profile details**  
+- ✅ **Reset password**  
+- ✅ Upload & delete **profile pictures**  
 
-## Deploy on Vercel
+### 🔹 **File Storage with AWS S3**  
+- ✅ **Securely store** lecture materials, assignments, and submissions  
+- ✅ URLs stored in the database for easy access  
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🌍 Deployment  
+
+The LMS is live and deployed on **Vercel** for seamless access.  
+
+🔗 **Live Demo:** [https://learning-management-system-beta.vercel.app]  
+
+### 🔑 **Test Credentials**  
+- **Student Login:**  
+  - **Username:** `st123`  
+  - **Password:** `lmsst123`  
+- **Teacher Login:**  
+  - **Username:** `tc123`  
+  - **Password:** `lmstc123`  
+- **Admin Login:**  
+  - **Username:** `admin`  
+  - **Password:** `admin123`  
+
+---
