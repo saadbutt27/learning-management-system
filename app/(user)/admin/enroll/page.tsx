@@ -141,35 +141,27 @@ export default function Enroll() {
           }),
         });
 
-        if (!response.ok) {
-          throw new Error("Failed to assign course to student");
+        if (!response.ok && response.status === 409) {
+          const errorData = await response.json();
+          throw new Error(errorData.error);
+        } else {
+          toast.success(`Student ${assignee} assigned successfully.`);
         }
 
-        toast.success(`Student ${assignee} assigned successfully.`);
         setStudent("");
         setTeacher("");
         setSelectedSemester(null);
         setSelectedCourse(null);
         setSelectedSection("");
       } catch (error) {
-        toast.error("Failed to assign course to student.");
+        if (error instanceof Error) {
+          toast.error(error.message);
+        } else {
+          toast.error("An unknown error occurred.");
+        }
         console.error(error);
       }
     }
-
-    // const newAssignment: CourseAssignment = {
-    //   id: assignments.length + 1,
-    //   course_id: selectedCourse,
-    //   assignedTo: assignee,
-    //   role,
-    // };
-    // setAssignments([...assignments, newAssignment]);
-    toast.success(`${role} ${assignee} assigned to selected courses.`);
-    // role === "Teacher" ? setTeacher("") : setStudent("");
-    // setSelectedCourse(null);
-    // setSelectedSection("");
-    // setTeacher("");
-    // setStudent("");
   };
 
   const handleSearchEnrollment = async (

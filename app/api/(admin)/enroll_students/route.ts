@@ -62,6 +62,15 @@ export async function POST(request: NextRequest) {
       values: [c_id, section],
     });
 
+    // Check if the course-teacher assignment exists
+    if (!assignemntId[0]) {
+      await query({ query: "ROLLBACK;", values: [] });
+      return NextResponse.json(
+        { error: "Course hasn't been assigned to teacher." },
+        { status: 409 } // Conflict
+      );
+    }
+
     // Insert data into the course_teacher_assign table
     const insertQuery = `
       INSERT INTO enroll_assign (s_id, c_id) 
